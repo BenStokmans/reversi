@@ -9,7 +9,6 @@
 #include <cassert>
 #include <iostream>
 #include <chrono>
-#include <glad/glad.h>
 
 class Logger {
 public:
@@ -26,8 +25,6 @@ public:
     void error(std::string_view message);
     void info(std::string_view message);
     void fatal(std::string_view message);
-
-    void logShaderInfo(std::string_view source, GLuint shader);
 private:
     std::vector<std::string> levels;
 
@@ -44,36 +41,40 @@ private:
     logger.fatal(log_source, x);  \
     exit(1);
 
-#define STREAM_DEBUG(x) \
+#define STREAM_TRACE(x, y) \
 	do { \
 		std::ostringstream ss; \
-		ss << x; \
-		LOG_DEBUG(ss.str()); \
+		ss << y; \
+		logger.trace(x, ss.str()); \
 	} while (0)
 
-#define STREAM_ERROR(x) \
+#define STREAM_DEBUG(x,y) \
 	do { \
 		std::ostringstream ss; \
-		ss << x; \
-		LOG_ERROR(ss.str()); \
+		ss << y; \
+		logger.debug(x, ss.str()); \
 	} while (0)
 
-#define STREAM_FATAL(x) \
+#define STREAM_ERROR(x,y) \
 	do { \
 		std::ostringstream ss; \
-		ss << x; \
-		logger.fatal(log_source, ss.str()); \
+		ss << y; \
+		logger.debug(x, ss.str()); \
+	} while (0)
+
+#define STREAM_FATAL(x, y) \
+	do { \
+		std::ostringstream ss; \
+		ss << y; \
+		logger.fatal(x, ss.str()); \
 	} while (0)
 
 #define LOG_ASSERT(EXPR) \
 	if (!(EXPR)) { \
-        STREAM_FATAL("(" << #EXPR << ") assert failed"); \
+        STREAM_FATAL(log_source, "(" << #EXPR << ") assert failed"); \
         assert(EXPR); \
         exit(1); \
     }
-
-#define LOG_SHADER(x) \
-    logger.logShaderInfo(std::string() + #x, x);
 
 extern Logger logger;
 

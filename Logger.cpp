@@ -32,11 +32,6 @@ void Logger::create(const std::string& verbosity) {
 
 void Logger::write(std::string_view verbosity, std::string_view source, std::string_view message) {
     auto it = std::find(this->levels.begin(), this->levels.end(), verbosity);
-    if (it != this->levels.end()) {
-        if (it - Logger::levels.begin() < this->currentVerbosityIndex) {
-            return;
-        }
-    }
 
     std::stringstream ss;
 
@@ -47,7 +42,9 @@ void Logger::write(std::string_view verbosity, std::string_view source, std::str
 
     ss << buf;
     ss << "[" << verbosity << " - " << source << "] " << message << std::endl;
-    std::cout << ss.str();
+    if (it != this->levels.end() && it - Logger::levels.begin() >= this->currentVerbosityIndex) {
+        std::cout << ss.str();
+    }
 
     if (this->filePath == "") return;
 
@@ -94,17 +91,4 @@ void Logger::fatal(std::string_view message) {
 
 void Logger::info(std::string_view message) {
     info("REVERSI", message);
-}
-
-void Logger::logShaderInfo(std::string_view source, GLuint shader) {
-    int success;
-    char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if (success) return;
-
-    glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-    std::ostringstream ss;
-    ss << "'" << source <<  "' Shader compilation failed: " << infoLog;
-    error("GUI", ss.str());
 }
