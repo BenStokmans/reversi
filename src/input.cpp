@@ -1,6 +1,6 @@
 #include "input.h"
 
-void bufferSizeCallback([[maybe_unused]] GLFWwindow* win, int w, int h) {
+void bufferSizeCallback([[maybe_unused]] GLFWwindow* window, int w, int h) {
     glViewport(0, 0, w, h);
 }
 

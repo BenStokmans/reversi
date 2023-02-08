@@ -4,22 +4,12 @@
 #include "state.h"
 #include "shaders.h"
 
-struct Point {
-    float x;
-    float y;
-};
-
-struct Color3 {
-    float r, g, b;
-};
-
 const float gridVertices[] = {
         -1.0,  1.0, 0.0, // Top Left
         -1.0, -1.0, 0.0, // Bottom Left
         1.0, -1.0, 0.0, // Bottom Right
         1.0,  1.0, 0.0, // Top Right
 };
-
 
 int main()
 {
@@ -86,7 +76,7 @@ int main()
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(glfwWindow)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // start manual rendering of game ui
@@ -109,8 +99,8 @@ int main()
             for (int j = 0; j < boardSize; j++) {
                 char side = board[i][j];
                 if (side == 0) continue;
-                float x = (-1+cellSize/2) + i*cellSize;
-                float y = (-1+cellSize/2) + j*cellSize;
+                float x = (-1+cellSize/2) + (float)i*cellSize;
+                float y = (-1+cellSize/2) + (float)j*cellSize;
 
                 bool white = side == 2;
                 circleShader.set("centre", glm::vec2(x,y));
@@ -129,7 +119,13 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // do ImGui rendering here
+        ImGui::Begin("Game", &gameWindowOpen, ImGuiWindowFlags_NoResize);
+        ImGui::SetWindowSize({200, 100}, ImGuiCond_FirstUseEver);
+        auto pos = ImGui::GetMainViewport()->Pos;
+        ImGui::SetWindowPos({pos.x + width, pos.y});
+
+        ImGui::Button("Start game");
+        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -143,7 +139,7 @@ int main()
         }
 
         // swap front and back buffers to prevent tearing
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(glfwWindow);
 
         // poll and process events
         glfwPollEvents();

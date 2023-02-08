@@ -1,11 +1,11 @@
 #include "ui.h"
 
-void glfw_error_callback(int error, const char* description) {
+void glfwErrorCallback(int error, const char* description) {
     logger.error("GLFW", std::to_string(error) + ": "  + description);
 }
 
 void initGLFW() {
-    glfwSetErrorCallback(glfw_error_callback);
+    glfwSetErrorCallback(glfwErrorCallback);
 
     if (!glfwInit()) {
         LOG_FATAL("glfw initialization failed")
@@ -17,29 +17,31 @@ void initGLFW() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
-    logger.debug("GLFW", "enabling OpenGL forward compatability");
-    // forward compatability is required on macOS
+    logger.debug("GLFW", "enabling OpenGL forward compatibility");
+    // forward compatibility is required on macOS
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     // prevent macOS resizing window
     glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
 #endif
 
-    window = glfwCreateWindow(width, height, "Reversi", nullptr, nullptr);
-    if (!window) {
+    glfwWindow = glfwCreateWindow(width, height, "Reversi", nullptr, nullptr);
+    if (!glfwWindow) {
         glfwTerminate();
         LOG_FATAL("failed to create window")
     }
     logger.trace("GLFW", "glfwCreateWindow success");
 
-    glfwSetWindowSizeLimits(window, width, height, width, height);
+    glfwSetWindowSizeLimits(glfwWindow, width, height, width, height);
 
-    glfwSetFramebufferSizeCallback(window, bufferSizeCallback);
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetMouseButtonCallback(window, mouseCallback);
+    glfwSetFramebufferSizeCallback(glfwWindow, bufferSizeCallback);
+    glfwSetKeyCallback(glfwWindow, keyCallback);
+    glfwSetMouseButtonCallback(glfwWindow, mouseCallback);
+    glfwSetWindowPos(glfwWindow, windowStartX, windowStartY);
+
     logger.trace("GLFW", "successfully set callbacks for frame buffer and HID input");
 
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(glfwWindow);
     glfwSwapInterval(1);
 
     logger.debug("GLFW", "GLFW initialization completed successfully");
@@ -76,7 +78,7 @@ void initImGui() {
         style.WindowRounding = 0.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
-    if (!ImGui_ImplGlfw_InitForOpenGL(window, true)) {
+    if (!ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true)) {
         LOG_FATAL("could not initialize ImGui for GLFW")
     }
 
@@ -93,6 +95,6 @@ void deInitAll() {
     ImGui::DestroyContext();
 
     logger.info("GLFW", "terminating");
-    if (window != nullptr) glfwDestroyWindow(window);
+    if (glfwWindow != nullptr) glfwDestroyWindow(glfwWindow);
     glfwTerminate();
 }
