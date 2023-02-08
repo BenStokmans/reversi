@@ -7,25 +7,25 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 find_package(OpenGL REQUIRED)
 
 include_directories(${OPENGL_INCLUDE_DIRS})
-include_directories(${PROJECT_SOURCE_DIR}/include/imgui)
-include_directories(${PROJECT_SOURCE_DIR}/include/imgui/backends)
+include_directories(${PROJECT_SOURCE_DIR}/lib/imgui)
+include_directories(${PROJECT_SOURCE_DIR}/lib/imgui/backends)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only" )
 set(GLFW_INSTALL OFF CACHE BOOL "GLFW lib only")
 
-add_subdirectory(include/glfw)
-add_subdirectory(include/glad)
-add_subdirectory(include/glm)
+add_subdirectory(lib/glfw)
+add_subdirectory(lib/glad)
+add_subdirectory(lib/glm)
 
-add_executable(reversi WIN32 MACOSX_BUNDLE main.cpp shader.cpp shader.h logger.cpp logger.h ui.cpp ui.h state.h input.cpp input.h state.cpp)
+add_executable(reversi WIN32 MACOSX_BUNDLE src/main.cpp src/shader.cpp src/shader.h src/logger.cpp src/logger.h src/ui.cpp src/ui.h src/state.h src/input.cpp src/input.h src/state.cpp)
 target_sources(reversi PRIVATE
-        include/imgui/imgui.cpp
-        include/imgui/imgui_draw.cpp
-        include/imgui/imgui_demo.cpp
-        include/imgui/imgui_tables.cpp
-        include/imgui/imgui_widgets.cpp
-        include/imgui/backends/imgui_impl_opengl3.cpp
-        include/imgui/backends/imgui_impl_glfw.cpp
+        lib/imgui/imgui.cpp
+        lib/imgui/imgui_draw.cpp
+        lib/imgui/imgui_demo.cpp
+        lib/imgui/imgui_tables.cpp
+        lib/imgui/imgui_widgets.cpp
+        lib/imgui/backends/imgui_impl_opengl3.cpp
+        lib/imgui/backends/imgui_impl_glfw.cpp
         )
 target_link_libraries(reversi PRIVATE glfw)
 target_link_libraries(reversi PRIVATE glad)

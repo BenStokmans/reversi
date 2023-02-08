@@ -9,7 +9,7 @@
 #include <cassert>
 #include <iostream>
 #include <chrono>
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 class Logger {
 public:

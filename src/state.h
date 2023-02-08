@@ -1,8 +1,8 @@
 #ifndef REVERSI_STATE_H
 #define REVERSI_STATE_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 
 
 extern int width;

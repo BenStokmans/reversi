@@ -4,7 +4,7 @@
 #include "helper.h"
 #include <cmath>
 #include <glut/glut.h>
-#include "Logger.h"
+#include "logger.h"
 
 int main(int argc, char ** argv);
 void reshapeCallback(GLsizei width, GLsizei height);

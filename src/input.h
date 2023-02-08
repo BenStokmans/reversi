@@ -2,8 +2,8 @@
 #define REVERSI_INPUT_H
 
 #include <cmath>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "logger.h"
 #include "state.h"
 #include "imgui.h"
