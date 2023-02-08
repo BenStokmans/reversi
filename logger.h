@@ -44,30 +44,44 @@ private:
     logger.fatal(log_source, x);  \
     exit(1);
 
-#define STREAM_DEBUG(x) \
+#define STREAM_TRACE(x, y) \
 	do { \
 		std::ostringstream ss; \
-		ss << x; \
-		LOG_DEBUG(ss.str()); \
+		ss << y; \
+		logger.trace(x, ss.str()); \
 	} while (0)
 
-#define STREAM_ERROR(x) \
+#define STREAM_DEBUG(x,y) \
 	do { \
 		std::ostringstream ss; \
-		ss << x; \
-		LOG_ERROR(ss.str()); \
+		ss << y; \
+		logger.debug(x, ss.str()); \
 	} while (0)
 
-#define STREAM_FATAL(x) \
+#define STREAM_INFO(x,y) \
 	do { \
 		std::ostringstream ss; \
-		ss << x; \
-		logger.fatal(log_source, ss.str()); \
+		ss << y; \
+		logger.info(x, ss.str()); \
+	} while (0)
+
+#define STREAM_ERROR(x,y) \
+	do { \
+		std::ostringstream ss; \
+		ss << y; \
+		logger.debug(x, ss.str()); \
+	} while (0)
+
+#define STREAM_FATAL(x, y) \
+	do { \
+		std::ostringstream ss; \
+		ss << y; \
+		logger.fatal(x, ss.str()); \
 	} while (0)
 
 #define LOG_ASSERT(EXPR) \
 	if (!(EXPR)) { \
-        STREAM_FATAL("(" << #EXPR << ") assert failed"); \
+        STREAM_FATAL(log_source, "(" << #EXPR << ") assert failed"); \
         assert(EXPR); \
         exit(1); \
     }

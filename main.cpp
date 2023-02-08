@@ -1,12 +1,7 @@
-#define GL_SILENCE_DEPRECATION
-#define GLM_FORCE_CTOR_INIT
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "Logger.h"
-#include "Shader.h"
+#include "logger.h"
+#include "shader.h"
+#include "ui.h"
+#include "state.h"
 
 struct Point {
     float x;
@@ -17,166 +12,124 @@ struct Color3 {
     float r, g, b;
 };
 
-void drawCircle(Point center, float radius, Color3 color) {
-    glBegin(GL_TRIANGLE_FAN);
-    glColor3f(color.r, color.g, color.b);
-
-    glVertex2f(center.x, center.y);
-    for(int i = 0; i <= 360; i++)
-        glVertex2f(radius*cos(M_PI * i / 180.0) + center.x, radius*sin(M_PI * i / 180.0) + center.y); // NOLINT(cppcoreguidelines-narrowing-conversions)
-
-    glEnd();
-}
-
-const float vertices[] = {
+const float gridVertices[] = {
         -1.0,  1.0, 0.0, // Top Left
         -1.0, -1.0, 0.0, // Bottom Left
         1.0, -1.0, 0.0, // Bottom Right
         1.0,  1.0, 0.0, // Top Right
 };
 
-float points[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
-};
-
-void bufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q || (key == GLFW_KEY_F4 && GLFW_MOD_ALT & mods)) {
-        glfwSetWindowShouldClose(window, true);
-    }
-}
-
-void mouseCallback(GLFWwindow* window, int button, int action, int mods)
-{
-    // process
-}
 
 int main()
 {
     // initialize Logger
     logger.create("TRACE");
-
     logger.info("starting reversi UI");
-    GLFWwindow* window;
 
-    if (!glfwInit()) {
-        LOG_FATAL("glfw initialization failed")
-    }
+    initGLFW();
+    initGLAD();
+    initImGui();
 
-    logger.trace("GUI", "glfwInit success");
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    logger.debug("GUI", "enabling opengl forward compatability...");
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-    window = glfwCreateWindow(800, 800, "Reversi", nullptr, nullptr);
-    if (!window) {
-        glfwTerminate();
-        LOG_FATAL("failed to create window")
-    }
-    logger.trace("GUI", "glfwCreateWindow success");
-
-    glfwSetFramebufferSizeCallback(window, bufferSizeCallback);
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetMouseButtonCallback(window, mouseCallback);
-    logger.trace("GUI", "successfully set callbacks for frame buffer and HID input");
-
-    //Get buffer size information
-    int bufferWidth, bufferHeight;
-    glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
-
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
-    {
-        LOG_FATAL("failed to initialize OpenGL context")
-    }
-
-    glViewport(0, 0, bufferWidth, bufferHeight);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    Shader shader = Shader::fromFile("shaders/grid");
+    Shader gridShader = Shader::fromFile("shaders/grid");
 
     // generate vbo and buffer data
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    GLuint gridVertexBuffer;
+    glGenBuffers(1, &gridVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, gridVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
 
     // generate vao and configure attributes
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    GLuint gridVertexArray;
+    glGenVertexArrays(1, &gridVertexArray);
+    glBindVertexArray(gridVertexArray);
 
-    GLint positionIndex = shader.getAttributeLocation("aPosition");
+    GLint positionIndex = gridShader.getAttributeLocation("aPosition");
     glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)nullptr);
     glEnableVertexAttribArray(positionIndex);
 
     Shader circleShader = Shader::fromFile("shaders/circle");
 
-    float right = 0.25;
-    float bottom = -0.25;
-    float left = -0.25;
-    float top = 0.25;
-    float quad[8] = {
-            //x, y, z, lx, ly
-            right, bottom,
-            right, top,
-            left, top,
-            left, bottom,
+    float cellSize = 2.0f / (float)boardSize;
+    float cellVertices[8] = {
+            cellSize, -cellSize,
+            cellSize, cellSize,
+            -cellSize, cellSize,
+            -cellSize, -cellSize,
     };
 
     // generate vbo and buffer data
-    GLuint vbo2;
-    glGenBuffers(1, &vbo2);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+    GLuint cellVertexBuffer;
+    glGenBuffers(1, &cellVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, cellVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cellVertices), cellVertices, GL_STATIC_DRAW);
 
     // generate vao and configure attributes
-    GLuint vao2;
-    glGenVertexArrays(1, &vao2);
-    glBindVertexArray(vao2);
+    GLuint cellVertexArray;
+    glGenVertexArrays(1, &cellVertexArray);
+    glBindVertexArray(cellVertexArray);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8, (void*)nullptr);
+    // set position attribute
+    positionIndex = gridShader.getAttributeLocation("aPosition");
+    glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 8, (void*)nullptr);
     glEnableVertexAttribArray(0);
 
     // setup
-    glClearColor(0.2f, 0.3f, 0.2f, 1.0f);
+    glClearColor(0.251, 0.3255, 0.2118, 1.);
+
+    // set shader parameters
+    gridShader.set("boardSize", boardSize);
+    gridShader.set("lineWidth", gridLineWidth);
+    gridShader.set("lineColor", glm::vec4{0, 0, 0, 1});
+
+    circleShader.set("radius", cellSize/2 - cellSize/10);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shader.use();
-        glBindVertexArray(vao);
+        // start manual rendering of game ui
+
+        // start using grid shader
+        gridShader.use();
+        glBindVertexArray(gridVertexArray);
+        // draw grid
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-        // clear program and vertex array
+        // clear shader program and vertex array
         glBindVertexArray(0);
         glUseProgram(0);
 
+        // start using circle shader to draw cells
         circleShader.use();
+        glBindVertexArray(cellVertexArray);
 
-        circleShader.set("centre", glm::vec2(0.5f,0.5f));
-        glBindVertexArray(vao2);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-        circleShader.set("centre", glm::vec2(-0.5f,-0.5f));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                char side = board[i][j];
+                if (side == 0) continue;
+                float x = (-1+cellSize/2) + i*cellSize;
+                float y = (-1+cellSize/2) + j*cellSize;
+
+                bool white = side == 2;
+                circleShader.set("centre", glm::vec2(x,y));
+                circleShader.set("white", white);
+                glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+            }
+        }
+
+        // unset shader program and vertex array for ImGui rendering
+        glBindVertexArray(0);
+        glUseProgram(0);
+
+        // end manual rendering game ui
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // do ImGui rendering here
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // swap front and back buffers to prevent tearing
         glfwSwapBuffers(window);
@@ -184,13 +137,15 @@ int main()
         // poll and process events
         glfwPollEvents();
     }
-    logger.info("GUI", "glfw window close requested; terminating...");
+    logger.info("GLFW", "glfw window close requested");
 
-    logger.trace("GUI", "cleaning up buffers and vertex arrays");
-    glDeleteBuffers(1, &vbo);
-    glDeleteVertexArrays(1, &vao);
-    glfwDestroyWindow(window);
+    logger.trace("OPENGL", "cleaning up buffers and vertex arrays");
+    glDeleteBuffers(1, &gridVertexBuffer);
+    glDeleteBuffers(1, &cellVertexBuffer);
+    glDeleteVertexArrays(1, &gridVertexArray);
+    glDeleteVertexArrays(1, &cellVertexArray);
 
-    glfwTerminate();
+    // clean up rendering context
+    deInitAll();
     return 0;
 }

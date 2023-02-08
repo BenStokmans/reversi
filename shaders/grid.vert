@@ -1,5 +1,5 @@
 #version 330 core
-layout (location = 1) in vec3 aPosition;
+layout (location = 0) in vec3 aPosition;
 out vec2 fragCoord;
 
 void main()

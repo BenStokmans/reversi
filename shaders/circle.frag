@@ -4,15 +4,19 @@ in vec2 fragCoord;
 out vec4 fragColor;
 
 uniform vec2 centre;
+uniform float radius;
 
-void main()
-{
-    float R = 1.0;
-    float R2 = 0.125;
+uniform bool white;
+
+void main() {
     float dist = distance(fragCoord, centre);
-    if (dist >= R2) {
+    if (dist >= radius) {
         discard;
     }
 
-    fragColor = vec4(1.0);
+    if (white) {
+        fragColor = vec4(1.0);
+        return;
+    }
+    fragColor = vec4(0, 0, 0, 1.0);
 }

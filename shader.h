@@ -1,7 +1,7 @@
 #ifndef REVERSI_SHADER_H
 #define REVERSI_SHADER_H
 
-#include "Logger.h"
+#include "logger.h"
 
 #include <filesystem>
 #include <fstream>

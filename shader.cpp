@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "shader.h"
 
 char* readFile(const std::filesystem::path& path) {
     auto wd = std::filesystem::current_path();
@@ -21,6 +21,7 @@ char* readFile(const std::filesystem::path& path) {
 }
 
 Shader Shader::fromFile(const std::string& shaderPath) {
+    logger.debug("OPENGL", "loading shader: " + std::string(shaderPath));
     return Shader{
         readFile(shaderPath + std::string(".vert")),
         readFile(shaderPath + std::string(".frag"))
@@ -28,6 +29,7 @@ Shader Shader::fromFile(const std::string& shaderPath) {
 }
 
 Shader Shader::fromFile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
+    logger.debug("OPENGL", "loading shader: " + std::string(vertexPath) + ", " + std::string(fragmentPath));
     return Shader{readFile(vertexPath), readFile(fragmentPath)};
 }
 
