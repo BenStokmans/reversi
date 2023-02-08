@@ -10,10 +10,13 @@ void keyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, [[m
     }
 }
 
-void mouseCallback(GLFWwindow* window, int button, [[maybe_unused]] int action, [[maybe_unused]] int mods) {
+void mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     // if we are mousing over an ImGui window don't process this input
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     if (io.WantCaptureMouse) return;
+
+    // action 0 indicates mouse up which we don't care about
+    if (action == 0) return;
 
     // get cursor position
     double x, y;
@@ -26,6 +29,8 @@ void mouseCallback(GLFWwindow* window, int button, [[maybe_unused]] int action, 
     int cellX = floor(x / (width / (double)boardSize));
     int cellY = floor(y / (height / (double)boardSize));
 
-    board[cellX][cellY] = button == 0 ? 1 : 2;
-    if (button == 3) board[cellX][cellY] = 0;
+    if (mods == 0) board[cellX][cellY] = button == 0 ? 1 : 2;
+    if (mods == 4 && button == 0) board[cellX][cellY] = 0;
+    if (mods == 2 && button == 0) highlighted[cellX][cellY] = true;
+    if (mods == 2 && button == 1) highlighted[cellX][cellY] = false;
 }

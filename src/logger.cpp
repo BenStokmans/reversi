@@ -4,9 +4,11 @@ Logger logger;
 
 void Logger::create(const std::string& verbosity) {
     auto path = std::filesystem::current_path();
+#ifdef __APPLE__
     if (std::string(path).find(".app") != std::string::npos) {
         path = path.parent_path().parent_path().parent_path();
     }
+#endif
     const auto logDirPath = path / "logs";
     if(!std::filesystem::exists(logDirPath)) {
         LOG_ASSERT(std::filesystem::create_directory(logDirPath))

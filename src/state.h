@@ -6,12 +6,12 @@
 
 extern int windowStartX, windowStartY;
 
-extern bool gameWindowOpen;
 extern int width;
 extern int height;
 
 extern int boardSize;
 extern float gridLineWidth;
+extern bool highlighted[8][8];
 extern char board[8][8];
 
 extern GLFWwindow* glfwWindow;

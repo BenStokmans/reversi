@@ -15,7 +15,7 @@ void initGLFW() {
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+
 #ifdef __APPLE__
     logger.debug("GLFW", "enabling OpenGL forward compatibility");
     // forward compatibility is required on macOS
@@ -68,6 +68,7 @@ void initImGui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
+
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -82,7 +83,7 @@ void initImGui() {
         LOG_FATAL("could not initialize ImGui for GLFW")
     }
 
-    if (!ImGui_ImplOpenGL3_Init("#version 150")) {
+    if (!ImGui_ImplOpenGL3_Init("#version 330 core")) {
         LOG_FATAL("could not initialize ImGui for OpenGL")
     }
     logger.info("IMGUI", "ImGui initialization completed successfully");

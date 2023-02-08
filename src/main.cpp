@@ -3,16 +3,9 @@
 #include "ui.h"
 #include "state.h"
 #include "shaders.h"
+#include "helper.h"
 
-const float gridVertices[] = {
-        -1.0,  1.0, 0.0, // Top Left
-        -1.0, -1.0, 0.0, // Bottom Left
-        1.0, -1.0, 0.0, // Bottom Right
-        1.0,  1.0, 0.0, // Top Right
-};
-
-int main()
-{
+int main() {
     // initialize Logger
     logger.create("TRACE");
     logger.info("starting reversi UI");
@@ -22,49 +15,19 @@ int main()
     initImGui();
 
     Shader gridShader = Shader(gridVert, gridFrag);
-
-    // generate vbo and buffer data
-    GLuint gridVertexBuffer;
-    glGenBuffers(1, &gridVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, gridVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
-
-    // generate vao and configure attributes
-    GLuint gridVertexArray;
-    glGenVertexArrays(1, &gridVertexArray);
-    glBindVertexArray(gridVertexArray);
-
-    GLint positionIndex = gridShader.getAttributeLocation("aPosition");
-    glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)nullptr);
-    glEnableVertexAttribArray(positionIndex);
+    GLuint gridVertexArray = createGridVertexArray(&gridShader);
 
     Shader circleShader = Shader(circleVert, circleFrag);
+    GLuint diskVertexArray = createDiskVertexArray(&circleShader);
 
-    float cellSize = 2.0f / (float)boardSize;
-    float cellVertices[8] = {
-            cellSize, -cellSize,
-            cellSize, cellSize,
-            -cellSize, cellSize,
-            -cellSize, -cellSize,
-    };
+    Shader squareShader = Shader(squareVert, squareFrag);
+    GLuint squareVertexArray = createSquareVertexArray(&squareShader);
 
-    // generate vbo and buffer data
-    GLuint cellVertexBuffer;
-    glGenBuffers(1, &cellVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, cellVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cellVertices), cellVertices, GL_STATIC_DRAW);
+    float diskSize = 2.0f / (float)boardSize;
+    float squareSize = 1.0f / (float)boardSize;
 
-    // generate vao and configure attributes
-    GLuint cellVertexArray;
-    glGenVertexArrays(1, &cellVertexArray);
-    glBindVertexArray(cellVertexArray);
-
-    // set position attribute
-    positionIndex = gridShader.getAttributeLocation("aPosition");
-    glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 8, (void*)nullptr);
-    glEnableVertexAttribArray(0);
-
-    // setup
+    // set background color
+    // rgb: 64, 83, 54
     glClearColor(0.251, 0.3255, 0.2118, 1.);
 
     // set shader parameters
@@ -72,7 +35,9 @@ int main()
     gridShader.set("lineWidth", gridLineWidth);
     gridShader.set("lineColor", glm::vec4{0, 0, 0, 1});
 
-    circleShader.set("radius", cellSize/2 - cellSize/10);
+    circleShader.set("radius", diskSize / 2 - diskSize / 10);
+    // rgb: 6, 83, 6
+    squareShader.set("color", glm::vec4{0.024, 0.3255, 0.024, 1});
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
@@ -80,6 +45,20 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // start manual rendering of game ui
+        // start using square shader
+        squareShader.use();
+        glBindVertexArray(squareVertexArray);
+
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (!highlighted[i][j]) continue;
+                float x = (-1 + squareSize) + (float)i * squareSize*2;
+                float y = (-1 + squareSize) + (float)j * squareSize*2;
+
+                squareShader.set("centre", glm::vec2(x,y));
+                glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+            }
+        }
 
         // start using grid shader
         gridShader.use();
@@ -87,20 +66,16 @@ int main()
         // draw grid
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-        // clear shader program and vertex array
-        glBindVertexArray(0);
-        glUseProgram(0);
-
         // start using circle shader to draw cells
         circleShader.use();
-        glBindVertexArray(cellVertexArray);
+        glBindVertexArray(diskVertexArray);
 
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 char side = board[i][j];
                 if (side == 0) continue;
-                float x = (-1+cellSize/2) + (float)i*cellSize;
-                float y = (-1+cellSize/2) + (float)j*cellSize;
+                float x = (-1 + diskSize / 2) + (float)i * diskSize;
+                float y = (-1 + diskSize / 2) + (float)j * diskSize;
 
                 bool white = side == 2;
                 circleShader.set("centre", glm::vec2(x,y));
@@ -109,23 +84,13 @@ int main()
             }
         }
 
-        // unset shader program and vertex array for ImGui rendering
-        glBindVertexArray(0);
-        glUseProgram(0);
-
         // end manual rendering game ui
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Game", &gameWindowOpen, ImGuiWindowFlags_NoResize);
-        ImGui::SetWindowSize({200, 100}, ImGuiCond_FirstUseEver);
-        auto pos = ImGui::GetMainViewport()->Pos;
-        ImGui::SetWindowPos({pos.x + width, pos.y});
-
-        ImGui::Button("Start game");
-        ImGui::End();
+        // do ImGui rendering
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -147,10 +112,8 @@ int main()
     logger.info("GLFW", "glfw window close requested");
 
     logger.trace("OPENGL", "cleaning up buffers and vertex arrays");
-    glDeleteBuffers(1, &gridVertexBuffer);
-    glDeleteBuffers(1, &cellVertexBuffer);
     glDeleteVertexArrays(1, &gridVertexArray);
-    glDeleteVertexArrays(1, &cellVertexArray);
+    glDeleteVertexArrays(1, &diskVertexArray);
 
     // clean up rendering context
     deInitAll();

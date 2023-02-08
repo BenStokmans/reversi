@@ -1,8 +1,9 @@
 #ifndef REVERSI_UI_H
 #define REVERSI_UI_H
 
-
+#ifdef __APPLE
 #define GL_SILENCE_DEPRECATION
+#endif
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 

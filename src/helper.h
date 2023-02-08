@@ -1,18 +1,12 @@
 #ifndef REVERSI_HELPER_H
 #define REVERSI_HELPER_H
-#include <glut/glut.h>
-#include <cmath>
 
-struct Point {
-    float x;
-    float y;
-};
 
-struct Color3 {
-    float r, g, b;
-};
+#include "shader.h"
+#include "state.h"
 
-void drawLine(Point start, Point end, Color3 color);
-void drawCircle(Point start, float radius, Color3 color);
+GLuint createGridVertexArray(Shader *shader);
+GLuint createDiskVertexArray(Shader *shader);
+GLuint createSquareVertexArray(Shader* shader);
 
 #endif //REVERSI_HELPER_H
