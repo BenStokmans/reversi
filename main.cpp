@@ -8,12 +8,37 @@
 #include "Logger.h"
 #include "Shader.h"
 
+struct Point {
+    float x;
+    float y;
+};
+
+struct Color3 {
+    float r, g, b;
+};
+
+void drawCircle(Point center, float radius, Color3 color) {
+    glBegin(GL_TRIANGLE_FAN);
+    glColor3f(color.r, color.g, color.b);
+
+    glVertex2f(center.x, center.y);
+    for(int i = 0; i <= 360; i++)
+        glVertex2f(radius*cos(M_PI * i / 180.0) + center.x, radius*sin(M_PI * i / 180.0) + center.y); // NOLINT(cppcoreguidelines-narrowing-conversions)
+
+    glEnd();
+}
 
 const float vertices[] = {
         -1.0,  1.0, 0.0, // Top Left
         -1.0, -1.0, 0.0, // Bottom Left
         1.0, -1.0, 0.0, // Bottom Right
         1.0,  1.0, 0.0, // Top Right
+};
+
+float points[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f,  0.5f, 0.0f
 };
 
 void bufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -32,7 +57,6 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods)
 {
     // process
 }
-
 
 int main()
 {
@@ -68,6 +92,10 @@ int main()
     glfwSetMouseButtonCallback(window, mouseCallback);
     logger.trace("GUI", "successfully set callbacks for frame buffer and HID input");
 
+    //Get buffer size information
+    int bufferWidth, bufferHeight;
+    glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
@@ -75,6 +103,13 @@ int main()
     {
         LOG_FATAL("failed to initialize OpenGL context")
     }
+
+    glViewport(0, 0, bufferWidth, bufferHeight);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 
     Shader shader = Shader::fromFile("shaders/grid");
 
@@ -93,15 +128,54 @@ int main()
     glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)nullptr);
     glEnableVertexAttribArray(positionIndex);
 
+    Shader circleShader = Shader::fromFile("shaders/circle");
+
+    float right = 0.25;
+    float bottom = -0.25;
+    float left = -0.25;
+    float top = 0.25;
+    float quad[8] = {
+            //x, y, z, lx, ly
+            right, bottom,
+            right, top,
+            left, top,
+            left, bottom,
+    };
+
+    // generate vbo and buffer data
+    GLuint vbo2;
+    glGenBuffers(1, &vbo2);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+
+    // generate vao and configure attributes
+    GLuint vao2;
+    glGenVertexArrays(1, &vao2);
+    glBindVertexArray(vao2);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8, (void*)nullptr);
+    glEnableVertexAttribArray(0);
+
     // setup
     glClearColor(0.2f, 0.3f, 0.2f, 1.0f);
-    shader.set("transform", scale(glm::mat4(), glm::vec3{ 1.f, 1.f, 1.f }));
 
     while (!glfwWindowShouldClose(window)) {
-        glBindVertexArray(vao);
-        shader.use();
-
         glClear(GL_COLOR_BUFFER_BIT);
+
+        shader.use();
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+        // clear program and vertex array
+        glBindVertexArray(0);
+        glUseProgram(0);
+
+        circleShader.use();
+
+        circleShader.set("centre", glm::vec2(0.5f,0.5f));
+        glBindVertexArray(vao2);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        circleShader.set("centre", glm::vec2(-0.5f,-0.5f));
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
         // swap front and back buffers to prevent tearing
