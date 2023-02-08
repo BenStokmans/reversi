@@ -4,6 +4,7 @@
 #include "state.h"
 #include "shaders.h"
 #include "helper.h"
+#include "reversi.h"
 
 int main() {
     // initialize Logger
@@ -13,6 +14,8 @@ int main() {
     initGLFW();
     initGLAD();
     initImGui();
+
+    initReversi();
 
     Shader gridShader = Shader(gridVert, gridFrag);
     GLuint gridVertexArray = createGridVertexArray(&gridShader);
@@ -24,7 +27,6 @@ int main() {
     GLuint squareVertexArray = createSquareVertexArray(&squareShader);
 
     float diskSize = 2.0f / (float)boardSize;
-    float squareSize = 1.0f / (float)boardSize;
 
     // set background color
     // rgb: 64, 83, 54
@@ -49,15 +51,8 @@ int main() {
         squareShader.use();
         glBindVertexArray(squareVertexArray);
 
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                if (!highlighted[i][j]) continue;
-                float x = (-1 + squareSize) + (float)i * squareSize*2;
-                float y = (-1 + squareSize) + (float)j * squareSize*2;
-
-                squareShader.set("centre", glm::vec2(x,y));
-                glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-            }
+        if (clientTurn) {
+            highLightPossibleMoves(&squareShader);
         }
 
         // start using grid shader
@@ -70,27 +65,52 @@ int main() {
         circleShader.use();
         glBindVertexArray(diskVertexArray);
 
+        double mouseX, mouseY;
+        glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
+        auto hoverCell = screenToCellCoords(mouseX, mouseY);
+
+        int whiteDisks = 0, blackDisks = 0;
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 char side = board[i][j];
-                if (side == 0) continue;
+
+                bool renderHover = i == hoverCell.x && j == hoverCell.y && clientTurn;
+                if (side == 0 && !renderHover) continue;
+
                 float x = (-1 + diskSize / 2) + (float)i * diskSize;
                 float y = (-1 + diskSize / 2) + (float)j * diskSize;
 
-                bool white = side == 2;
+                auto color = glm::vec4(0);
+                if (side == 1) {
+                    color = glm::vec4(0, 0, 0, 1.f);
+                    blackDisks++;
+                }
+                if (side == 2) {
+                    color = glm::vec4(1);
+                    whiteDisks++;
+                }
+
+                if (renderHover && side == 0) {
+                    color = glm::vec4(glm::vec3(clientIsWhite ? 1 : 0), 0.3);
+                }
                 circleShader.set("centre", glm::vec2(x,y));
-                circleShader.set("white", white);
+                circleShader.set("color", color);
                 glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
             }
         }
-
         // end manual rendering game ui
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // do ImGui rendering
+        ImGui::Begin("Debug", &showDebugWindow);
+        ImGui::Text("Turn: %s", clientTurn ? (clientIsWhite ? "white" : "black") : (clientIsWhite ? "black" : "white"));
+        ImGui::Text("White disks: %d", whiteDisks);
+        ImGui::Text("Black disks: %d", blackDisks);
+        ImGui::Checkbox("Client is white", &clientIsWhite);
+        ImGui::Checkbox("Client to play", &clientTurn);
+        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

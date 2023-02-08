@@ -18,19 +18,19 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     // action 0 indicates mouse up which we don't care about
     if (action == 0) return;
 
-    // get cursor position
+    // if it's not our turn not process click
+    if (!clientTurn) return;
+
+    // get cursor position as cell coordinate
     double x, y;
     glfwGetCursorPos(window, &x, &y);
+    auto cell = screenToCellCoords(x, y);
 
-    // 0, 0 is top left of window
-    // 800, 800 is bottom right of window
-    // our grid has the y-axis inverted compared to the mouse coordinates, so we'll account for that
-    y = height - y;
-    int cellX = floor(x / (width / (double)boardSize));
-    int cellY = floor(y / (height / (double)boardSize));
+    if (!moveIsValid(cell)) return;
+    playMove(cell);
+    clientTurn = false;
 
-    if (mods == 0) board[cellX][cellY] = button == 0 ? 1 : 2;
-    if (mods == 4 && button == 0) board[cellX][cellY] = 0;
-    if (mods == 2 && button == 0) highlighted[cellX][cellY] = true;
-    if (mods == 2 && button == 1) highlighted[cellX][cellY] = false;
+    if (!playingLocal) return;
+    clientTurn = true;
+    clientIsWhite = !clientIsWhite;
 }

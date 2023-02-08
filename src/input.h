@@ -7,6 +7,8 @@
 #include "logger.h"
 #include "state.h"
 #include "imgui.h"
+#include "helper.h"
+#include "reversi.h"
 
 void bufferSizeCallback([[maybe_unused]] GLFWwindow* win, int w, int h);
 void keyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, [[maybe_unused]] int action, int mods);

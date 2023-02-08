@@ -1,6 +1,6 @@
 #include "helper.h"
 
-GLuint createGridVertexArray(Shader *shader) {
+GLuint createGridVertexArray(Shader* shader) {
     const float gridVertices[12] = {
             -1.0,  1.0, 0.0,    // top left
             -1.0, -1.0, 0.0,    // bottom left
@@ -25,7 +25,7 @@ GLuint createGridVertexArray(Shader *shader) {
     return gridVertexArray;
 }
 
-GLuint createDiskVertexArray(Shader *shader) {
+GLuint createDiskVertexArray(Shader* shader) {
     float diskSize = 2.0f / (float)boardSize;
     float diskVertices[12] = {
             diskSize, -diskSize, 0,
@@ -53,7 +53,7 @@ GLuint createDiskVertexArray(Shader *shader) {
     return diskVertexArray;
 }
 
-GLuint createSquareVertexArray(Shader *shader) {
+GLuint createSquareVertexArray(Shader* shader) {
     float squareSize = 1.0f / (float)boardSize;
     float squareVertices[12] = {
             squareSize, -squareSize, 0,
@@ -79,4 +79,14 @@ GLuint createSquareVertexArray(Shader *shader) {
     glEnableVertexAttribArray(positionIndex);
 
     return squareVertexArray;
+}
+
+Point screenToCellCoords(double x, double y) {
+    // 0, 0 is top left of window
+    // 800, 800 is bottom right of window
+    // our grid has the y-axis inverted compared to the mouse coordinates, so we'll account for that
+    y = height - y;
+    int cellX = floor(x / (width / (double)boardSize));
+    int cellY = floor(y / (height / (double)boardSize));
+    return {cellX, cellY};
 }

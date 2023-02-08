@@ -6,7 +6,7 @@ out vec4 fragColor;
 uniform vec2 centre;
 uniform float radius;
 
-uniform bool white;
+uniform vec4 color;
 
 void main() {
     float dist = distance(fragCoord, centre);
@@ -14,9 +14,5 @@ void main() {
         discard;
     }
 
-    if (white) {
-        fragColor = vec4(1.0);
-        return;
-    }
-    fragColor = vec4(0, 0, 0, 1.0);
+    fragColor = color;
 }

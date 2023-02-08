@@ -41,7 +41,7 @@ add_subdirectory(lib/glfw)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/glm)
 
-add_executable(reversi WIN32 MACOSX_BUNDLE src/main.cpp src/shader.cpp src/shader.h src/logger.cpp src/logger.h src/ui.cpp src/ui.h src/state.h src/input.cpp src/input.h src/state.cpp src/shaders.h src/helper.cpp src/helper.h)
+add_executable(reversi WIN32 MACOSX_BUNDLE src/main.cpp src/shader.cpp src/shader.h src/logger.cpp src/logger.h src/ui.cpp src/ui.h src/state.h src/input.cpp src/input.h src/state.cpp src/shaders.h src/helper.cpp src/helper.h src/reversi.cpp src/reversi.h)
 target_sources(reversi PRIVATE
         lib/imgui/imgui.cpp
         lib/imgui/imgui_draw.cpp
