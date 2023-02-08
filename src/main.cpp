@@ -84,6 +84,8 @@ int main()
 
     circleShader.set("radius", cellSize/2 - cellSize/10);
 
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -131,6 +133,14 @@ int main()
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
 
         // swap front and back buffers to prevent tearing
         glfwSwapBuffers(window);
