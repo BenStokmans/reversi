@@ -9,6 +9,7 @@
 #include <cassert>
 #include <iostream>
 #include <chrono>
+#include <glad/glad.h>
 
 class Logger {
 public:
@@ -25,6 +26,8 @@ public:
     void error(std::string_view message);
     void info(std::string_view message);
     void fatal(std::string_view message);
+
+    void logShaderInfo(std::string_view source, GLuint shader);
 private:
     std::vector<std::string> levels;
 
@@ -55,6 +58,13 @@ private:
 		logger.debug(x, ss.str()); \
 	} while (0)
 
+#define STREAM_INFO(x,y) \
+	do { \
+		std::ostringstream ss; \
+		ss << y; \
+		logger.info(x, ss.str()); \
+	} while (0)
+
 #define STREAM_ERROR(x,y) \
 	do { \
 		std::ostringstream ss; \
@@ -75,6 +85,9 @@ private:
         assert(EXPR); \
         exit(1); \
     }
+
+#define LOG_SHADER(x) \
+    logger.logShaderInfo(std::string() + #x, x);
 
 extern Logger logger;
 
