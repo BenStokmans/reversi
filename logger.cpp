@@ -92,3 +92,16 @@ void Logger::fatal(std::string_view message) {
 void Logger::info(std::string_view message) {
     info("REVERSI", message);
 }
+
+void Logger::logShaderInfo(std::string_view source, GLuint shader) {
+    int success;
+    char infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+    if (success) return;
+
+    glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+    std::ostringstream ss;
+    ss << "'" << source <<  "' Shader compilation failed: " << infoLog;
+    error("OPENGL", ss.str());
+}
