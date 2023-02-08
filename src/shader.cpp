@@ -1,39 +1,6 @@
 #include "shader.h"
 
-char* readFile(const std::filesystem::path& path) {
-    auto wd = std::filesystem::current_path();
-    if (std::string(path).find(".app") != std::string::npos) {
-        wd = path.parent_path().parent_path().parent_path();
-    }
-    auto filePath = wd / path;
-
-    std::ifstream f(filePath, std::ios::in | std::ios::binary);
-    if (!f.good()) {
-        logger.error("SHADER", "error reading file at: " + std::string(filePath));
-        return nullptr;
-    }
-    const auto size = std::filesystem::file_size(filePath);
-
-    char* buf = new char[size];
-    f.read(buf, size); // NOLINT(cppcoreguidelines-narrowing-conversions)
-
-    return buf;
-}
-
-Shader Shader::fromFile(const std::string& shaderPath) {
-    logger.debug("OPENGL", "loading shader: " + std::string(shaderPath));
-    return Shader{
-        readFile(shaderPath + std::string(".vert")),
-        readFile(shaderPath + std::string(".frag"))
-    };
-}
-
-Shader Shader::fromFile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
-    logger.debug("OPENGL", "loading shader: " + std::string(vertexPath) + ", " + std::string(fragmentPath));
-    return Shader{readFile(vertexPath), readFile(fragmentPath)};
-}
-
-Shader::Shader(char *vertexSource, char *fragmentSource) {
+Shader::Shader(const char *vertexSource, const char *fragmentSource) {
     LOG_ASSERT(vertexSource != nullptr)
     LOG_ASSERT(fragmentSource != nullptr)
 

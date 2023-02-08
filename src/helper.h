@@ -1,7 +1,3 @@
-//
-// Created by Ben on 07/02/2023.
-//
-
 #ifndef REVERSI_HELPER_H
 #define REVERSI_HELPER_H
 #include <glut/glut.h>

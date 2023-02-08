@@ -17,9 +17,7 @@
 
 class Shader {
 public:
-    static Shader fromFile(const std::string& shaderPath);
-    static Shader fromFile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath);
-    Shader(char* vertexSource, char* fragmentSource);
+    Shader(const char* vertexSource, const char* fragmentSource);
     ~Shader();
 
     void use() const;

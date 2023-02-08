@@ -2,6 +2,7 @@
 #include "shader.h"
 #include "ui.h"
 #include "state.h"
+#include "shaders.h"
 
 struct Point {
     float x;
@@ -30,7 +31,7 @@ int main()
     initGLAD();
     initImGui();
 
-    Shader gridShader = Shader::fromFile("shaders/grid");
+    Shader gridShader = Shader(gridVert, gridFrag);
 
     // generate vbo and buffer data
     GLuint gridVertexBuffer;
@@ -47,7 +48,7 @@ int main()
     glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)nullptr);
     glEnableVertexAttribArray(positionIndex);
 
-    Shader circleShader = Shader::fromFile("shaders/circle");
+    Shader circleShader = Shader(circleVert, circleFrag);
 
     float cellSize = 2.0f / (float)boardSize;
     float cellVertices[8] = {
