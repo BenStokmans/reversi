@@ -37,15 +37,15 @@ void UI::DrawUI() {
 
 void UI::DrawGame(
         Shader* gridShader, GLuint gridVAO,
-        Shader* squareShader, GLuint squareVAO,
-        Shader* circleShader, GLuint circleVAO
+        Shader* cellShader, GLuint cellVAO,
+        Shader* diskShader, GLuint diskVAO
     ) {
-    squareShader->use();
-    glBindVertexArray(squareVAO);
+    cellShader->use();
+    glBindVertexArray(cellVAO);
 
     // render highlighting
-    highlightPossibleMoves(squareShader);
-    highLightModified(squareShader);
+    highlightPossibleMoves(cellShader);
+    highLightModified(cellShader);
 
     // draw grid on top of the highlighted squares
     gridShader->use();
@@ -53,9 +53,9 @@ void UI::DrawGame(
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
     // draw disks
-    circleShader->use();
-    glBindVertexArray(circleVAO);
-    drawDisks(circleShader);
+    diskShader->use();
+    glBindVertexArray(diskVAO);
+    drawDisks(diskShader);
 }
 
 

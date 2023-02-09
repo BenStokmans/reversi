@@ -8,17 +8,18 @@ int main() {
     UI::Init();
     Game::Init();
 
+    // shader loading has to be done in main
     LOG_SHADER_NAME(gridVert, gridFrag);
     Shader gridShader = Shader(gridVert, gridFrag);
     GLuint gridVertexArray = createGridVertexArray(&gridShader);
 
-    LOG_SHADER_NAME(circleVert, circleFrag);
-    Shader circleShader = Shader(circleVert, circleFrag);
-    GLuint diskVertexArray = createDiskVertexArray(&circleShader);
+    LOG_SHADER_NAME(cellVert, cellFrag);
+    Shader cellShader = Shader(cellVert, cellFrag);
+    GLuint cellVertexArray = createCellVertexArray(&cellShader);
 
-    LOG_SHADER_NAME(squareVert, squareFragq);
-    Shader squareShader = Shader(squareVert, squareFrag);
-    GLuint squareVertexArray = createSquareVertexArray(&squareShader);
+    LOG_SHADER_NAME(diskVert, diskFrag);
+    Shader diskShader = Shader(diskVert, diskFrag);
+    GLuint diskVertexArray = createDiskVertexArray(&diskShader);
 
     float diskSize = 2.0f / (float)boardSize;
 
@@ -31,7 +32,7 @@ int main() {
     gridShader.set("lineWidth", gridLineWidth);
     gridShader.set("lineColor", glm::vec4{0, 0, 0, 1});
 
-    circleShader.set("radius", diskSize / 2 - diskSize / 10);
+    diskShader.set("radius", diskSize / 2 - diskSize / 10);
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     while (!glfwWindowShouldClose(glfwWindow)) {
@@ -39,8 +40,8 @@ int main() {
 
         UI::DrawGame(
                 &gridShader, gridVertexArray,
-                &squareShader, squareVertexArray,
-                &circleShader, diskVertexArray
+                &cellShader, cellVertexArray,
+                &diskShader, diskVertexArray
                      );
 
         UI::DrawUI();
@@ -50,6 +51,9 @@ int main() {
         // poll and process events
         glfwPollEvents();
     }
+    glDeleteVertexArrays(1, &gridVertexArray);
+    glDeleteVertexArrays(1, &cellVertexArray);
+    glDeleteVertexArrays(1, &diskVertexArray);
     logger.info("GLFW", "glfw window close requested");
 
     logger.trace("OPENGL", "cleaning up buffers and vertex arrays");

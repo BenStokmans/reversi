@@ -49,7 +49,7 @@ GLuint createDiskVertexArray(Shader* shader) {
     return diskVertexArray;
 }
 
-GLuint createSquareVertexArray(Shader* shader) {
+GLuint createCellVertexArray(Shader* shader) {
     float squareSize = 1.0f / (float)boardSize;
     float squareVertices[12] = {
             squareSize, -squareSize, 0,

@@ -6,7 +6,7 @@
 
 GLuint createGridVertexArray(Shader* shader);
 GLuint createDiskVertexArray(Shader* shader);
-GLuint createSquareVertexArray(Shader* shader);
+GLuint createCellVertexArray(Shader* shader);
 
 Point screenToCellCoords(double x, double y);
 std::vector<Point> getSurroundingCoordinates(Point p);

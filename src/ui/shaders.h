@@ -1,11 +1,11 @@
 #ifndef REVERSI_RESOURCES_H
 #define REVERSI_RESOURCES_H
 
-extern const char* circleFrag;
-extern const char* circleVert;
+extern const char* cellFrag;
+extern const char* cellVert;
+extern const char* diskFrag;
+extern const char* diskVert;
 extern const char* gridFrag;
 extern const char* gridVert;
-extern const char* squareFrag;
-extern const char* squareVert;
 
 #endif //REVERSI_RESOURCES_H

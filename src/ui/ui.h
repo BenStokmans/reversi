@@ -25,8 +25,8 @@
 namespace UI {
     void DrawGame(
             Shader* gridShader, GLuint gridVAO,
-            Shader* squareShader, GLuint squareVAO,
-            Shader* circleShader, GLuint circleVAO
+            Shader* cellShader, GLuint cellVAO,
+            Shader* diskShader, GLuint diskVAO
     );
     void DrawUI();
     void Init();
