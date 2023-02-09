@@ -5,6 +5,8 @@
 #include "GLFW/glfw3.h"
 #include <vector>
 
+#define DEBUG
+
 struct Point {
     int x,y;
 };
@@ -15,11 +17,19 @@ struct Move {
 };
 
 extern bool showDebugWindow;
+extern bool showWinWindow;
+extern bool winWindowFocus;
+extern bool gameOver;
 
 extern int windowStartX, windowStartY;
 
 extern int width;
 extern int height;
+
+#define CURRENT_PLAYER (char)(clientTurn ? (clientIsWhite ? 2 : 1) : (clientIsWhite ? 1 : 2))
+#define NEXT_PLAYER (char)(clientTurn ? (clientIsWhite ? 1 : 2) : (clientIsWhite ? 2 : 1))
+
+#define LOCAL_PLAYER clientIsWhite ? 2 : 1
 
 extern bool playingLocal;
 extern bool clientTurn;

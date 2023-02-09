@@ -1,6 +1,9 @@
 #include "state.h"
 
 bool showDebugWindow = true;
+bool showWinWindow = true;
+bool winWindowFocus = true;
+bool gameOver = true;
 
 int windowStartX = 100, windowStartY = 100;
 

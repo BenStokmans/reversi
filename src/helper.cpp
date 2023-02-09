@@ -13,7 +13,6 @@ GLuint createGridVertexArray(Shader* shader) {
     glBindBuffer(GL_ARRAY_BUFFER, gridVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
 
-    // generate vao and configure attributes
     GLuint gridVertexArray;
     glGenVertexArrays(1, &gridVertexArray);
     glBindVertexArray(gridVertexArray);
@@ -34,18 +33,15 @@ GLuint createDiskVertexArray(Shader* shader) {
             -diskSize, -diskSize, 0,
     };
 
-    // generate vbo and buffer data
     GLuint diskVertexBuffer;
     glGenBuffers(1, &diskVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, diskVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(diskVertices), diskVertices, GL_STATIC_DRAW);
 
-    // generate vao and configure attributes
     GLuint diskVertexArray;
     glGenVertexArrays(1, &diskVertexArray);
     glBindVertexArray(diskVertexArray);
 
-    // set position attribute
     GLint positionIndex = shader->getAttributeLocation("aPosition");
     glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 12, (void*)nullptr);
     glEnableVertexAttribArray(positionIndex);
@@ -62,18 +58,15 @@ GLuint createSquareVertexArray(Shader* shader) {
             -squareSize, -squareSize, 0,
     };
 
-    // generate vertex buffer and buffer data
     GLuint squareVertexBuffer;
     glGenBuffers(1, &squareVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, squareVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
 
-    // generate vertex array and configure attributes
     GLuint squareVertexArray;
     glGenVertexArrays(1, &squareVertexArray);
     glBindVertexArray(squareVertexArray);
 
-    // set position attribute
     GLint positionIndex = shader->getAttributeLocation("aPosition");
     glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 12, (void*)nullptr);
     glEnableVertexAttribArray(positionIndex);

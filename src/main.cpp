@@ -49,7 +49,7 @@ int main() {
     while (!glfwWindowShouldClose(glfwWindow)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // start manual rendering of game ui
+        // start OpenGL rendering of game ui
         // start using square shader
         squareShader.use();
         glBindVertexArray(squareVertexArray);
@@ -73,6 +73,7 @@ int main() {
         auto hoverCell = screenToCellCoords(mouseX, mouseY);
 
         int whiteDisks = 0, blackDisks = 0;
+        // draw all disks on the board and the hovered cell if it's our turn
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 char side = board[i][j];
@@ -101,24 +102,50 @@ int main() {
                 glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
             }
         }
-        // end manual rendering game ui
+        // end OpenGL rendering game ui
 
+        // start OpenGL GLFW ImGui rendering
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        // draw game over window if the game is over
+        if (gameOver) {
+            if (winWindowFocus) {
+                winWindowFocus = false;
+                ImGui::SetNextWindowFocus();
+            }
+            ImGui::SetWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_FirstUseEver);
+
+            ImGui::Begin("Game over", &showWinWindow);
+            ImGui::Text("%s has won the game!", whiteDisks > blackDisks ? "white" : "black");
+            ImGui::End();
+        }
+
+        // draw debug window if we are currently running in debug mode
+#ifdef DEBUG
         ImGui::Begin("Debug", &showDebugWindow);
         if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(ImGuiKey_Q)) {
             glfwSetWindowShouldClose(glfwWindow, true);
         }
 
-        ImGui::Text("Turn: %s", clientTurn ? (clientIsWhite ? "white" : "black") : (clientIsWhite ? "black" : "white"));
+        ImGui::Text("Turn: %s", CURRENT_PLAYER == 2 ? "white" : "black");
         ImGui::Text("White disks: %d", whiteDisks);
         ImGui::Text("Black disks: %d", blackDisks);
+        ImGui::Text("Game over: %s", gameOver ? "true" : "false");
         if (ImGui::Checkbox("Client is white", &clientIsWhite)) currentLegalMoves.clear();
         if (ImGui::Checkbox("Client to play", &clientTurn)) currentLegalMoves.clear();
         ImGui::End();
+#endif
+        ImGui::Begin("Reversi", &showDebugWindow);
+        if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(ImGuiKey_Q)) {
+            glfwSetWindowShouldClose(glfwWindow, true);
+        }
 
+        if (ImGui::Button("Restart game")) {
+            initReversi();
+        }
+        ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

@@ -1,7 +1,23 @@
 #include "reversi.h"
 
 void initReversi() {
-    // generate starting disks
+    // reset game over popup
+    gameOver = false;
+    winWindowFocus = true;
+
+    // clear data from previous game
+    currentLegalMoves.clear();
+    clientIsWhite = false;
+    clientTurn = true;
+
+    // zero out all board squares
+    for (int i = 0; i < boardSize; i++) {
+        for (int j = 0; j < boardSize; j++) {
+            board[i][j] = 0;
+        }
+    }
+
+    // set starting disks
     board[3][3] = 1;
     board[3][4] = 2;
     board[4][3] = 2;
@@ -24,11 +40,9 @@ std::vector<Point> getSurroundingCoordinates(Point p) {
 void playMove(const Move& move) {
     char client = clientIsWhite ? 2 : 1;
     for (auto direction : move.directions) {
-        int idx = direction.x, idy = direction.y;
+        int dx = direction.x, dy = direction.y;
+        int x = move.square.x + dx, y = move.square.y + dy;
 
-        int x = move.square.x + idx, y = move.square.y + idy;
-
-        std::vector<Point> opponentDisks;
         while (x > -1 && x < boardSize && y > 0 && y < boardSize) {
             // if we encounter an empty space this direction is automatically invalid
             if (board[x][y] == 0) break;
@@ -38,16 +52,21 @@ void playMove(const Move& move) {
             if (board[x][y] != client) {
                 board[x][y] = client;
             }
-            x += idx, y += idy;
+            x += dx, y += dy;
         }
     }
     // if (modified > 0) board[move.x][move.y] = client;
     board[move.square.x][move.square.y] = client;
+    currentLegalMoves.clear();
+    auto moves = getPossibleMoves(NEXT_PLAYER);
+    if (moves.empty()) {
+        gameOver = true;
+        return;
+    }
+    if (!clientTurn) currentLegalMoves.clear();
 }
 
-Move getValidDirectionsForSquare(Point square) {
-    char client = clientIsWhite ? 2 : 1;
-
+Move getValidDirectionsForSquare(Point square, char color) {
     std::vector<Point> directions;
     for (auto point : getSurroundingCoordinates(square)) {
         if (board[point.x][point.y] == 0) continue;
@@ -62,9 +81,9 @@ Move getValidDirectionsForSquare(Point square) {
         while (x > -1 && x < boardSize && y > -1 && y < boardSize) {
             // if we encounter an empty space this direction is automatically invalid
             if (board[x][y] == 0) break;
-            if (board[x][y] != client) opponentCount++;
-            if (board[x][y] == client && opponentCount == 0) break;
-            if (board[x][y] == client && opponentCount > 0) {
+            if (board[x][y] != color) opponentCount++;
+            if (board[x][y] == color && opponentCount == 0) break;
+            if (board[x][y] == color && opponentCount > 0) {
                 directions.push_back({idx, idy});
                 break;
             }
@@ -90,21 +109,21 @@ Move getMove(Point point) {
     return {};
 }
 
-std::vector<Move> getPossibleMoves() {
+std::vector<Move> getPossibleMoves(char color) {
     // if we already calculated all the legal moves for this turn return those
     if (!currentLegalMoves.empty()) {
         return currentLegalMoves;
     }
+
     std::vector<Move> moves;
-    char client = clientIsWhite ? 2 : 1;
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
-            if (board[i][j] == 0 || board[i][j] == client) continue;
+            if (board[i][j] == 0 || board[i][j] == color) continue;
 
             auto points = getSurroundingCoordinates({i, j});
             for (auto point : points) {
                 if (board[point.x][point.y] != 0) continue;
-                Move move = getValidDirectionsForSquare(point);
+                Move move = getValidDirectionsForSquare(point, color);
                 if (move.directions.empty()) continue;
                 moves.push_back(move);
             }
@@ -117,7 +136,7 @@ std::vector<Move> getPossibleMoves() {
 void highLightPossibleMoves(Shader* shader) {
     float squareSize = 1.0f / (float)boardSize;
 
-    auto possibleMoves = getPossibleMoves();
+    auto possibleMoves = getPossibleMoves(LOCAL_PLAYER);
     for (const auto& move : possibleMoves) {
         float x = (-1 + squareSize) + (float)move.square.x * squareSize*2;
         float y = (-1 + squareSize) + (float)move.square.y * squareSize*2;

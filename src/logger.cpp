@@ -35,13 +35,12 @@ void Logger::create(const std::string& verbosity) {
 void Logger::write(std::string_view verbosity, std::string_view source, std::string_view message) {
     auto it = std::find(this->levels.begin(), this->levels.end(), verbosity);
 
-    std::stringstream ss;
-
     time_t now = time(nullptr);
     struct tm* time = localtime(&now);
     char buf[20];
     strftime(buf, sizeof(buf), "[%EX]", time);
 
+    std::stringstream ss;
     ss << buf;
     ss << "[" << verbosity << " - " << source << "] " << message << std::endl;
     if (it != this->levels.end() && it - Logger::levels.begin() >= this->currentVerbosityIndex) {
@@ -49,7 +48,6 @@ void Logger::write(std::string_view verbosity, std::string_view source, std::str
     }
 
     if (this->filePath == "") return;
-
     std::ofstream file(this->filePath, std::ios_base::app);
     file << ss.str();
     file.close();
@@ -99,7 +97,6 @@ void Logger::logShaderInfo(std::string_view source, GLuint shader) {
     int success;
     char infoLog[512];
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
     if (success) return;
 
     glGetShaderInfoLog(shader, 512, nullptr, infoLog);

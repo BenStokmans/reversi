@@ -10,7 +10,7 @@ void keyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, [[m
     }
 }
 
-void mouseCallback(GLFWwindow* window, int button, int action, int mods) {
+void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, [[maybe_unused]] int mods) {
     // if we are mousing over an ImGui window don't process this input
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     if (io.WantCaptureMouse) return;
@@ -26,14 +26,13 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     glfwGetCursorPos(window, &x, &y);
     auto cell = screenToCellCoords(x, y);
 
+    // if the move has valid directions
     Move move = getMove(cell);
     if (move.directions.empty()) return;
 
     // play the move
     playMove(move);
     clientTurn = false;
-    // clear the current legal moves so they are refreshed
-    currentLegalMoves.clear();
 
     if (!playingLocal) return;
     clientTurn = true;

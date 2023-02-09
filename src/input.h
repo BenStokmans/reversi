@@ -12,6 +12,6 @@
 
 void bufferSizeCallback([[maybe_unused]] GLFWwindow* win, int w, int h);
 void keyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, [[maybe_unused]] int action, int mods);
-void mouseCallback(GLFWwindow* window, int button, [[maybe_unused]] int action, [[maybe_unused]] int mods);
+void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, [[maybe_unused]] int action, [[maybe_unused]] [[maybe_unused]] int mods);
 
 #endif //REVERSI_INPUT_H
