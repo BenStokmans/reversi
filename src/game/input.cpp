@@ -28,11 +28,11 @@ void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, 
     auto cell = screenToCellCoords(x, y);
 
     // if the move has valid directions
-    Move move = getMove(cell);
+    Move move = Game::GetMove(cell);
     if (move.directions.empty()) return;
 
     // play the move
-    playMove(move);
+    Game::PlayMove(move);
     if (!gameStarted) gameStarted = true;
 
     // change player turn
@@ -40,11 +40,8 @@ void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, 
     if (!clientTurn && !aiEnabled)
         currentLegalMoves.clear();
 
-    if (aiEnabled && CURRENT_PLAYER == aiColor && !aiManual) {
-        Move m = getBestMove(aiDifficulty, aiColor, aiDepth);
-        playMove(m);
-        clientTurn = !clientTurn;
-    }
+    if (aiEnabled && CURRENT_PLAYER == aiColor && !aiManual)
+        Game::AI::PlayBestMove(aiDifficulty, aiColor, aiDepth);
 
     if (!playingLocal || aiEnabled) return;
     clientTurn = true;

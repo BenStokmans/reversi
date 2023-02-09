@@ -4,10 +4,10 @@
 #include <cmath>
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "logger.h"
-#include "state.h"
+#include "../logger.h"
+#include "../state.h"
 #include "imgui.h"
-#include "helper.h"
+#include "../ui/helper.h"
 #include "reversi.h"
 
 void bufferSizeCallback([[maybe_unused]] GLFWwindow* win, int w, int h);

@@ -1,7 +1,7 @@
 #ifndef REVERSI_SHADER_H
 #define REVERSI_SHADER_H
 
-#include "logger.h"
+#include "../logger.h"
 
 #include <filesystem>
 #include <fstream>
@@ -14,14 +14,17 @@
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "state.h"
+#include "../state.h"
+
 
 class Shader {
 public:
+    Shader() {}
     Shader(const char* vertexSource, const char* fragmentSource);
     ~Shader();
 
     void use() const;
+    void destroy() const;
 
     void set(const char* name, int value);
     void set(const char* name, bool value);

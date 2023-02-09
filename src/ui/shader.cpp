@@ -59,6 +59,11 @@ Shader::~Shader() {
     glDeleteProgram(this->program);
 }
 
+void Shader::destroy() const {
+    glDeleteProgram(this->program);
+}
+
+
 void Shader::use() const {
     glUseProgram(program);
 }
@@ -128,4 +133,3 @@ void Shader::set(const char *name, const Color4 &value) {
 GLint Shader::getAttributeLocation(const char* name) const {
     return glGetAttribLocation(program, name);
 }
-

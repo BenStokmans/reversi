@@ -11,11 +11,11 @@ Move randomMove(const std::vector<Move>& moves) {
 }
 
 Move getBestMoveRandom(char color) {
-    auto moves = getPossibleMoves(color);
+    auto moves = Game::GetPossibleMoves(color);
     return randomMove(moves);
 }
 
-Move getBestMove(AiDifficulty difficulty, char color, int depth) {
+Move Game::AI::GetBestMove(AiDifficulty difficulty, char color, int depth) {
     switch (difficulty) {
         case Random:
             return getBestMoveRandom(color);
@@ -27,5 +27,11 @@ Move getBestMove(AiDifficulty difficulty, char color, int depth) {
             break;
     }
     return {};
+}
+
+void Game::AI::PlayBestMove(AiDifficulty difficulty, char color, int depth) {
+    Move m = Game::AI::GetBestMove(aiDifficulty, aiColor, aiDepth);
+    Game::PlayMove(m);
+    clientTurn = true;
 }
 

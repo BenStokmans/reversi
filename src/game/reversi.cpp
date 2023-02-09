@@ -1,7 +1,7 @@
 #include "reversi.h"
 #include "ai.h"
 
-void initReversi() {
+void Game::Init() {
     // reset game over popup
     gameOver = false;
     winWindowFocus = true;
@@ -44,7 +44,7 @@ std::vector<Point> getSurroundingCoordinates(Point p) {
     return points;
 }
 
-void playMove(const Move& move) {
+void Game::PlayMove(const Move& move) {
     char color = CURRENT_PLAYER;
     // clear modified squares
     modifiedSquares.clear();
@@ -70,7 +70,7 @@ void playMove(const Move& move) {
     }
 
     currentLegalMoves.clear();
-    auto moves = getPossibleMoves(NEXT_PLAYER);
+    auto moves = Game::GetPossibleMoves(NEXT_PLAYER);
     if (moves.empty()) {
         gameOver = true;
         return;
@@ -108,7 +108,7 @@ Move getValidDirectionsForSquare(Point square, char color) {
     return {square, directions};
 }
 
-Move getMove(Point point) {
+Move Game::GetMove(Point point) {
     // if there is already a disk here we can't place there
     if (board[point.x][point.y] != 0) return {};
     // check if the move is in current legal moves
@@ -120,7 +120,7 @@ Move getMove(Point point) {
     return {};
 }
 
-std::vector<Move> getPossibleMoves(char color) {
+std::vector<Move> Game::GetPossibleMoves(char color) {
     // if we already calculated all the legal moves for this turn return those
     if (!currentLegalMoves.empty()) {
         return currentLegalMoves;
@@ -142,31 +142,4 @@ std::vector<Move> getPossibleMoves(char color) {
     }
 
     return moves;
-}
-
-void highlightPossibleMoves(Shader* shader) {
-    if (!highlightPossibleSquares || !clientTurn) return;
-    float squareSize = 1.0f / (float)boardSize;
-
-    shader->set("color", highlightPossibleColor);
-    auto possibleMoves = getPossibleMoves(LOCAL_PLAYER);
-    for (const auto& move : possibleMoves) {
-        float x = (-1 + squareSize) + (float)move.square.x * squareSize*2;
-        float y = (-1 + squareSize) + (float)move.square.y * squareSize*2;
-        shader->set("centre", glm::vec2(x,y));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    }
-}
-
-void highLightModified(Shader* shader) {
-    if (!highlightModifiedSquares) return;
-    float squareSize = 1.0f / (float)boardSize;
-
-    shader->set("color", highlightModifiedColor);
-    for (const auto& square : modifiedSquares) {
-        float x = (-1 + squareSize) + (float)square.x * squareSize*2;
-        float y = (-1 + squareSize) + (float)square.y * squareSize*2;
-        shader->set("centre", glm::vec2(x,y));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    }
 }
