@@ -23,14 +23,13 @@ std::vector<Point> getSurroundingCoordinates(Point p) {
 
 void playMove(const Move& move) {
     char client = clientIsWhite ? 2 : 1;
-    int modified = 0;
     for (auto direction : move.directions) {
         int idx = direction.x, idy = direction.y;
 
         int x = move.square.x + idx, y = move.square.y + idy;
 
         std::vector<Point> opponentDisks;
-        while (x > 0 && x < boardSize && y > 0 && y < boardSize) {
+        while (x > -1 && x < boardSize && y > 0 && y < boardSize) {
             // if we encounter an empty space this direction is automatically invalid
             if (board[x][y] == 0) break;
             if (board[x][y] == client) {
@@ -60,7 +59,7 @@ Move getValidDirectionsForSquare(Point square) {
 
         // keep count of the amount of opponent disks we've encountered because for a valid path this has to be > 0
         int opponentCount = 0;
-        while (x > 0 && x < boardSize && y > 0 && y < boardSize) {
+        while (x > -1 && x < boardSize && y > -1 && y < boardSize) {
             // if we encounter an empty space this direction is automatically invalid
             if (board[x][y] == 0) break;
             if (board[x][y] != client) opponentCount++;

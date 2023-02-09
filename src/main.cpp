@@ -25,7 +25,7 @@ int main() {
     Shader circleShader = Shader(circleVert, circleFrag);
     GLuint diskVertexArray = createDiskVertexArray(&circleShader);
 
-    LOG_SHADER_NAME(squareVert, squareFrag);
+    LOG_SHADER_NAME(squareVert, squareFragq);
     Shader squareShader = Shader(squareVert, squareFrag);
     GLuint squareVertexArray = createSquareVertexArray(&squareShader);
 
