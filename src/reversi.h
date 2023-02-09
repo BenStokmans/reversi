@@ -5,7 +5,8 @@
 #include "helper.h"
 
 void initReversi();
-void highLightPossibleMoves(Shader* shader);
+void highlightPossibleMoves(Shader* shader);
+void highLightModified(Shader* shader);
 void playMove(const Move& move);
 Move getMove(Point point);
 std::vector<Move> getPossibleMoves(char color);

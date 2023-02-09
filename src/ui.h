@@ -13,7 +13,10 @@
 
 #include "logger.h"
 #include "input.h"
+#include "state.h"
+#include "ai.h"
 
+void drawSettingsUi();
 void initGLFW();
 void initGLAD();
 void initImGui();

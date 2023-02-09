@@ -41,11 +41,8 @@ int main() {
     gridShader.set("lineColor", glm::vec4{0, 0, 0, 1});
 
     circleShader.set("radius", diskSize / 2 - diskSize / 10);
-    // rgb: 6, 83, 6
-    squareShader.set("color", glm::vec4{0.024, 0.3255, 0.024, 1});
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-
     while (!glfwWindowShouldClose(glfwWindow)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -54,9 +51,9 @@ int main() {
         squareShader.use();
         glBindVertexArray(squareVertexArray);
 
-        if (clientTurn) {
-            highLightPossibleMoves(&squareShader);
-        }
+        // render highlighting
+        highlightPossibleMoves(&squareShader);
+        highLightModified(&squareShader);
 
         // start using grid shader
         gridShader.use();
@@ -103,7 +100,6 @@ int main() {
             }
         }
         // end OpenGL rendering game ui
-
         // start OpenGL GLFW ImGui rendering
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -115,7 +111,7 @@ int main() {
                 winWindowFocus = false;
                 ImGui::SetNextWindowFocus();
             }
-            ImGui::SetWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_FirstUseEver);
+            ImGui::SetWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing);
 
             ImGui::Begin("Game over", &showWinWindow);
             ImGui::Text("%s has won the game!", whiteDisks > blackDisks ? "white" : "black");
@@ -133,28 +129,30 @@ int main() {
         ImGui::Text("White disks: %d", whiteDisks);
         ImGui::Text("Black disks: %d", blackDisks);
         ImGui::Text("Game over: %s", gameOver ? "true" : "false");
-        if (ImGui::Checkbox("Client is white", &clientIsWhite)) currentLegalMoves.clear();
+
+        ImGui::BeginDisabled(aiEnabled);
+
+        if (ImGui::Checkbox("Client is white", &clientIsWhite)) {
+            aiColor = clientIsWhite ? 1 : 2;
+            aiColorStr = clientIsWhite ? "Black" : "White";
+            currentLegalMoves.clear();
+        }
         if (ImGui::Checkbox("Client to play", &clientTurn)) currentLegalMoves.clear();
+
+        ImGui::EndDisabled();
         ImGui::End();
 #endif
-        ImGui::Begin("Reversi", &showDebugWindow);
-        if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(ImGuiKey_Q)) {
-            glfwSetWindowShouldClose(glfwWindow, true);
-        }
 
-        if (ImGui::Button("Restart game")) {
-            initReversi();
-        }
-        ImGui::End();
+        drawSettingsUi();
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)         {
+            GLFWwindow* contextBackup = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup_current_context);
+            glfwMakeContextCurrent(contextBackup);
         }
 
         // swap front and back buffers to prevent tearing

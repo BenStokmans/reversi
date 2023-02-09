@@ -97,6 +97,35 @@ void Shader::set(const char* name, const glm::mat4 &value) {
     glUniformMatrix4fv(cachedUniforms[name], 1, GL_FALSE, glm::value_ptr(value));
 }
 
+void Shader::set(const char *name, const Color3 &value) {
+    use();
+    glUniform4fv(
+            cachedUniforms[name],
+            1,
+            glm::value_ptr(glm::vec4(
+                    (float)value.r / 255.f,
+                    (float)value.g / 255.f,
+                    (float)value.b / 255.f,
+                    1.f
+            ))
+    );
+}
+
+void Shader::set(const char *name, const Color4 &value) {
+    use();
+    glUniform4fv(
+            cachedUniforms[name],
+            1,
+            glm::value_ptr(glm::vec4(
+                    (float)value.r / 255.f,
+                    (float)value.g / 255.f,
+                    (float)value.b / 255.f,
+                    (float)value.a / 255.f
+                    ))
+    );
+}
+
 GLint Shader::getAttributeLocation(const char* name) const {
     return glGetAttribLocation(program, name);
 }
+

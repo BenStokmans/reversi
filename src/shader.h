@@ -14,6 +14,7 @@
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "state.h"
 
 class Shader {
 public:
@@ -29,6 +30,8 @@ public:
     void set(const char* name, const glm::vec3& value);
     void set(const char* name, const glm::vec4& value);
     void set(const char* name, const glm::mat4& value);
+    void set(const char* name, const Color3& value);
+    void set(const char* name, const Color4& value);
 
     GLint getAttributeLocation(const char* name) const;
 private:

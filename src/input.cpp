@@ -1,4 +1,5 @@
 #include "input.h"
+#include "ai.h"
 
 void bufferSizeCallback([[maybe_unused]] GLFWwindow* window, int w, int h) {
     glViewport(0, 0, w, h);
@@ -32,9 +33,20 @@ void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, 
 
     // play the move
     playMove(move);
-    clientTurn = false;
+    if (!gameStarted) gameStarted = true;
 
-    if (!playingLocal) return;
+    // change player turn
+    clientTurn = !clientTurn;
+    if (!clientTurn && !aiEnabled)
+        currentLegalMoves.clear();
+
+    if (aiEnabled && CURRENT_PLAYER == aiColor && !aiManual) {
+        Move m = getBestMove(aiDifficulty, aiColor, aiDepth);
+        playMove(m);
+        clientTurn = !clientTurn;
+    }
+
+    if (!playingLocal || aiEnabled) return;
     clientTurn = true;
     clientIsWhite = !clientIsWhite;
 }

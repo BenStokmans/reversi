@@ -1,4 +1,5 @@
 #include "reversi.h"
+#include "ai.h"
 
 void initReversi() {
     // reset game over popup
@@ -6,9 +7,15 @@ void initReversi() {
     winWindowFocus = true;
 
     // clear data from previous game
+    modifiedSquares.clear();
     currentLegalMoves.clear();
     clientIsWhite = false;
     clientTurn = true;
+    if (aiEnabled) {
+        clientIsWhite = aiColor == 1;
+        if (clientIsWhite)
+            clientTurn = false;
+    }
 
     // zero out all board squares
     for (int i = 0; i < boardSize; i++) {
@@ -38,7 +45,10 @@ std::vector<Point> getSurroundingCoordinates(Point p) {
 }
 
 void playMove(const Move& move) {
-    char client = clientIsWhite ? 2 : 1;
+    char color = CURRENT_PLAYER;
+    // clear modified squares
+    modifiedSquares.clear();
+
     for (auto direction : move.directions) {
         int dx = direction.x, dy = direction.y;
         int x = move.square.x + dx, y = move.square.y + dy;
@@ -46,24 +56,25 @@ void playMove(const Move& move) {
         while (x > -1 && x < boardSize && y > 0 && y < boardSize) {
             // if we encounter an empty space this direction is automatically invalid
             if (board[x][y] == 0) break;
-            if (board[x][y] == client) {
-                break;
-            }
-            if (board[x][y] != client) {
-                board[x][y] = client;
+            if (board[x][y] == color) break;
+            if (board[x][y] != color) {
+                board[x][y] = color;
+                modifiedSquares.push_back({x,y});
             }
             x += dx, y += dy;
         }
     }
-    // if (modified > 0) board[move.x][move.y] = client;
-    board[move.square.x][move.square.y] = client;
+    if (!move.directions.empty()) {
+        board[move.square.x][move.square.y] = color;
+        modifiedSquares.push_back(move.square);
+    }
+
     currentLegalMoves.clear();
     auto moves = getPossibleMoves(NEXT_PLAYER);
     if (moves.empty()) {
         gameOver = true;
         return;
     }
-    if (!clientTurn) currentLegalMoves.clear();
 }
 
 Move getValidDirectionsForSquare(Point square, char color) {
@@ -133,13 +144,28 @@ std::vector<Move> getPossibleMoves(char color) {
     return moves;
 }
 
-void highLightPossibleMoves(Shader* shader) {
+void highlightPossibleMoves(Shader* shader) {
+    if (!highlightPossibleSquares || !clientTurn) return;
     float squareSize = 1.0f / (float)boardSize;
 
+    shader->set("color", highlightPossibleColor);
     auto possibleMoves = getPossibleMoves(LOCAL_PLAYER);
     for (const auto& move : possibleMoves) {
         float x = (-1 + squareSize) + (float)move.square.x * squareSize*2;
         float y = (-1 + squareSize) + (float)move.square.y * squareSize*2;
+        shader->set("centre", glm::vec2(x,y));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
+}
+
+void highLightModified(Shader* shader) {
+    if (!highlightModifiedSquares) return;
+    float squareSize = 1.0f / (float)boardSize;
+
+    shader->set("color", highlightModifiedColor);
+    for (const auto& square : modifiedSquares) {
+        float x = (-1 + squareSize) + (float)square.x * squareSize*2;
+        float y = (-1 + squareSize) + (float)square.y * squareSize*2;
         shader->set("centre", glm::vec2(x,y));
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
