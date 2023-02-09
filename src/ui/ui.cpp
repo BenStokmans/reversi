@@ -5,6 +5,10 @@ void UI::DrawUI() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    auto size = ImGui::GetMainViewport()->Size;
+    ImGui::SetNextWindowSize({400,250}, ImGuiCond_Once);
+    ImGui::SetNextWindowPos({size.x + 125, 125}, ImGuiCond_Once);
+
     ImGui::Begin("Reversi", &showGameWindow, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
     if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(ImGuiKey_Q)) {
         glfwSetWindowShouldClose(glfwWindow, true);
@@ -47,7 +51,7 @@ void UI::DrawGame(
     highlightPossibleMoves(cellShader);
     highLightModified(cellShader);
 
-    // draw grid on top of the highlighted squares
+    // draw grid on top of the highlighted cells
     gridShader->use();
     glBindVertexArray(gridVAO);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

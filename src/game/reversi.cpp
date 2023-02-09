@@ -4,10 +4,11 @@
 void Game::Init() {
     // reset game over popup
     gameOver = false;
+    gameStarted = false;
     winWindowFocus = true;
 
     // clear data from previous game
-    modifiedSquares.clear();
+    modifiedCells.clear();
     currentLegalMoves.clear();
     clientIsWhite = false;
     clientTurn = true;
@@ -17,7 +18,7 @@ void Game::Init() {
             clientTurn = false;
     }
 
-    // zero out all board squares
+    // zero out all board cells
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
             board[i][j] = 0;
@@ -46,12 +47,12 @@ std::vector<Point> getSurroundingCoordinates(Point p) {
 
 void Game::PlayMove(const Move& move) {
     char color = CURRENT_PLAYER;
-    // clear modified squares
-    modifiedSquares.clear();
+    // clear modified cells
+    modifiedCells.clear();
 
     for (auto direction : move.directions) {
         int dx = direction.x, dy = direction.y;
-        int x = move.square.x + dx, y = move.square.y + dy;
+        int x = move.cell.x + dx, y = move.cell.y + dy;
 
         while (x > -1 && x < boardSize && y > 0 && y < boardSize) {
             // if we encounter an empty space this direction is automatically invalid
@@ -59,14 +60,14 @@ void Game::PlayMove(const Move& move) {
             if (board[x][y] == color) break;
             if (board[x][y] != color) {
                 board[x][y] = color;
-                modifiedSquares.push_back({x,y});
+                modifiedCells.push_back({x, y});
             }
             x += dx, y += dy;
         }
     }
     if (!move.directions.empty()) {
-        board[move.square.x][move.square.y] = color;
-        modifiedSquares.push_back(move.square);
+        board[move.cell.x][move.cell.y] = color;
+        modifiedCells.push_back(move.cell);
     }
 
     currentLegalMoves.clear();
@@ -77,15 +78,16 @@ void Game::PlayMove(const Move& move) {
     }
 }
 
-Move getValidDirectionsForSquare(Point square, char color) {
+Move getValidDirectionsForCell(Point cell, char color) {
     std::vector<Point> directions;
-    for (auto point : getSurroundingCoordinates(square)) {
+
+    for (auto point : getSurroundingCoordinates(cell)) {
         if (board[point.x][point.y] == 0) continue;
         // get direction vector x -> y
-        int dx = square.x - point.x, dy = square.y - point.y;
+        int dx = cell.x - point.x, dy = cell.y - point.y;
         // invert the direction
         int idx = -1 * dx, idy = -1 * dy;
-        int x = square.x + idx, y = square.y + idy;
+        int x = cell.x + idx, y = cell.y + idy;
 
         // keep count of the amount of opponent disks we've encountered because for a valid path this has to be > 0
         int opponentCount = 0;
@@ -101,11 +103,11 @@ Move getValidDirectionsForSquare(Point square, char color) {
             x += idx, y += idy;
         }
     }
-    auto move = Move{square, directions};
+    auto move = Move{cell, directions};
     if (!directions.empty()) {
         currentLegalMoves.push_back(move);
     }
-    return {square, directions};
+    return {cell, directions};
 }
 
 Move Game::GetMove(Point point) {
@@ -113,7 +115,7 @@ Move Game::GetMove(Point point) {
     if (board[point.x][point.y] != 0) return {};
     // check if the move is in current legal moves
     for (Move move : currentLegalMoves) {
-        if (point.x == move.square.x && point.y == move.square.y) {
+        if (point.x == move.cell.x && point.y == move.cell.y) {
             return move;
         }
     }
@@ -134,7 +136,7 @@ std::vector<Move> Game::GetPossibleMoves(char color) {
             auto points = getSurroundingCoordinates({i, j});
             for (auto point : points) {
                 if (board[point.x][point.y] != 0) continue;
-                Move move = getValidDirectionsForSquare(point, color);
+                Move move = getValidDirectionsForCell(point, color);
                 if (move.directions.empty()) continue;
                 moves.push_back(move);
             }

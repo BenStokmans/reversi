@@ -12,7 +12,7 @@ void ThemeTab::Draw() {
             (float)highlightPossibleColor.b / 255.f,
             (float)highlightPossibleColor.a / 255.f
     };
-    ImGui::Checkbox("Highlight legal moves", &highlightPossibleSquares);
+    ImGui::Checkbox("Highlight legal moves", &highlightPossibleCells);
     if (ImGui::ColorEdit4("1",highlightPossibleColorBuffer, ImGuiColorEditFlags_NoLabel)) {
         highlightPossibleColor = {
                 (unsigned char)(highlightPossibleColorBuffer[0]*255.f),
@@ -28,7 +28,7 @@ void ThemeTab::Draw() {
             (float)highlightModifiedColor.b / 255.f,
             (float)highlightModifiedColor.a / 255.f
     };
-    ImGui::Checkbox("Highlight modified disks", &highlightModifiedSquares);
+    ImGui::Checkbox("Highlight modified disks", &highlightModifiedCells);
     if (ImGui::ColorEdit4("2",highlightModifiedColorBuffer, ImGuiColorEditFlags_NoLabel)) {
         highlightModifiedColor = {
                 (unsigned char)(highlightModifiedColorBuffer[0]*255.f),

@@ -20,7 +20,7 @@ struct Point {
 };
 
 struct Move {
-    Point square;
+    Point cell;
     std::vector<Point> directions;
 };
 
@@ -65,11 +65,11 @@ extern int boardSize;
 extern float gridLineWidth;
 
 extern Color4 highlightPossibleColor;
-extern bool highlightPossibleSquares;
+extern bool highlightPossibleCells;
 extern Color4 highlightModifiedColor;
-extern bool highlightModifiedSquares;
+extern bool highlightModifiedCells;
 
-extern std::vector<Point> modifiedSquares;
+extern std::vector<Point> modifiedCells;
 extern std::vector<Move> currentLegalMoves;
 extern bool highlighted[8][8];
 extern char board[8][8];

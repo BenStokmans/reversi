@@ -34,27 +34,27 @@ void drawDisks(Shader* shader) {
 }
 
 void highlightPossibleMoves(Shader* shader) {
-    if (!highlightPossibleSquares || !clientTurn) return;
-    float squareSize = 1.0f / (float)boardSize;
+    if (!highlightPossibleCells || !clientTurn) return;
+    float cellSize = 1.0f / (float)boardSize;
 
     shader->set("color", highlightPossibleColor);
     auto possibleMoves = Game::GetPossibleMoves(LOCAL_PLAYER);
     for (const auto& move : possibleMoves) {
-        float x = (-1 + squareSize) + (float)move.square.x * squareSize*2;
-        float y = (-1 + squareSize) + (float)move.square.y * squareSize*2;
+        float x = (-1 + cellSize) + (float)move.cell.x * cellSize * 2;
+        float y = (-1 + cellSize) + (float)move.cell.y * cellSize * 2;
         shader->set("centre", glm::vec2(x,y));
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 }
 
 void highLightModified(Shader* shader) {
-    if (!highlightModifiedSquares) return;
-    float squareSize = 1.0f / (float)boardSize;
+    if (!highlightModifiedCells) return;
+    float cellSize = 1.0f / (float)boardSize;
 
     shader->set("color", highlightModifiedColor);
-    for (const auto& square : modifiedSquares) {
-        float x = (-1 + squareSize) + (float)square.x * squareSize*2;
-        float y = (-1 + squareSize) + (float)square.y * squareSize*2;
+    for (const auto& cell : modifiedCells) {
+        float x = (-1 + cellSize) + (float)cell.x * cellSize * 2;
+        float y = (-1 + cellSize) + (float)cell.y * cellSize * 2;
         shader->set("centre", glm::vec2(x,y));
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
@@ -65,7 +65,7 @@ void drawGameOver() {
         winWindowFocus = false;
         ImGui::SetNextWindowFocus();
     }
-    ImGui::SetWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing);
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing);
 
     int whiteDisks = 0, blackDisks = 0;
     for (int i = 0; i < boardSize; i++) {

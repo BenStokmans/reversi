@@ -50,28 +50,28 @@ GLuint createDiskVertexArray(Shader* shader) {
 }
 
 GLuint createCellVertexArray(Shader* shader) {
-    float squareSize = 1.0f / (float)boardSize;
-    float squareVertices[12] = {
-            squareSize, -squareSize, 0,
-            squareSize, squareSize, 0,
-            -squareSize, squareSize, 0,
-            -squareSize, -squareSize, 0,
+    float cellSize = 1.0f / (float)boardSize;
+    float cellVertices[12] = {
+            cellSize, -cellSize, 0,
+            cellSize, cellSize, 0,
+            -cellSize, cellSize, 0,
+            -cellSize, -cellSize, 0,
     };
 
-    GLuint squareVertexBuffer;
-    glGenBuffers(1, &squareVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, squareVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
+    GLuint cellVertexBuffer;
+    glGenBuffers(1, &cellVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, cellVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cellVertices), cellVertices, GL_STATIC_DRAW);
 
-    GLuint squareVertexArray;
-    glGenVertexArrays(1, &squareVertexArray);
-    glBindVertexArray(squareVertexArray);
+    GLuint cellVertexArray;
+    glGenVertexArrays(1, &cellVertexArray);
+    glBindVertexArray(cellVertexArray);
 
     GLint positionIndex = shader->getAttributeLocation("aPosition");
     glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 12, (void*)nullptr);
     glEnableVertexAttribArray(positionIndex);
 
-    return squareVertexArray;
+    return cellVertexArray;
 }
 
 Point screenToCellCoords(double x, double y) {

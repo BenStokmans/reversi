@@ -27,11 +27,11 @@ int boardSize = 8;
 float gridLineWidth = 0.005f;
 
 Color4 highlightPossibleColor = {6, 100, 6, 255};
-bool highlightPossibleSquares = true;
+bool highlightPossibleCells = true;
 Color4 highlightModifiedColor = {255, 113, 116, 160};
-bool highlightModifiedSquares = true;
+bool highlightModifiedCells = true;
 
-std::vector<Point> modifiedSquares;
+std::vector<Point> modifiedCells;
 std::vector<Move> currentLegalMoves;
 bool highlighted[8][8] = {};
 char board[8][8] = {};
