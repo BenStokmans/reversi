@@ -21,61 +21,42 @@ std::vector<Point> getSurroundingCoordinates(Point p) {
     return points;
 }
 
-// TODO: Optimize all the following functions
-// FIXME: OPTIMIZE!!!!!!
-void playMove(Point move) {
+void playMove(const Move& move) {
     char client = clientIsWhite ? 2 : 1;
     int modified = 0;
-    for (auto point : getSurroundingCoordinates(move)) {
-        if (board[point.x][point.y] == 0) continue;
-        // get direction vector x -> y
-        int dx = move.x - point.x, dy = move.y - point.y;
-        // invert the direction
-        int idx = -1 * dx, idy = -1 * dy;
+    for (auto direction : move.directions) {
+        int idx = direction.x, idy = direction.y;
 
-        int i = 1;
-        int x = move.x + i * idx, y = move.y + i * idy;
+        int x = move.square.x + idx, y = move.square.y + idy;
 
-        // keep count of the amount of opponent disks we've encountered because for a valid path this has to be > 0
-        int opponentCount = 0;
-        bool legal = false;
         std::vector<Point> opponentDisks;
         while (x > 0 && x < boardSize && y > 0 && y < boardSize) {
             // if we encounter an empty space this direction is automatically invalid
             if (board[x][y] == 0) break;
-            if (board[x][y] != client) {
-                opponentDisks.push_back({x,y});
-                opponentCount++;
-            }
-            if (board[x][y] == client && opponentCount > 0) {
-                legal = true;
+            if (board[x][y] == client) {
                 break;
             }
-            i++;
-            x = move.x + i * idx, y = move.y + i * idy;
-        }
-
-        if (!legal) continue;
-        for (auto disk : opponentDisks) {
-            board[disk.x][disk.y] = client;
-            modified++;
+            if (board[x][y] != client) {
+                board[x][y] = client;
+            }
+            x += idx, y += idy;
         }
     }
-    if (modified > 0) board[move.x][move.y] = client;
+    // if (modified > 0) board[move.x][move.y] = client;
+    board[move.square.x][move.square.y] = client;
 }
 
-// FIXME: Optimize multiple usages this has to have a more efficient implementation but im retarded
-bool hasOppositeDisk(Point p, const std::vector<Point>& surround) {
+Move getValidDirectionsForSquare(Point square) {
     char client = clientIsWhite ? 2 : 1;
-    for (auto point : surround) {
+
+    std::vector<Point> directions;
+    for (auto point : getSurroundingCoordinates(square)) {
         if (board[point.x][point.y] == 0) continue;
         // get direction vector x -> y
-        int dx = p.x - point.x, dy = p.y - point.y;
+        int dx = square.x - point.x, dy = square.y - point.y;
         // invert the direction
         int idx = -1 * dx, idy = -1 * dy;
-
-        int i = 1;
-        int x = p.x + i * idx, y = p.y + i * idy;
+        int x = square.x + idx, y = square.y + idy;
 
         // keep count of the amount of opponent disks we've encountered because for a valid path this has to be > 0
         int opponentCount = 0;
@@ -83,33 +64,50 @@ bool hasOppositeDisk(Point p, const std::vector<Point>& surround) {
             // if we encounter an empty space this direction is automatically invalid
             if (board[x][y] == 0) break;
             if (board[x][y] != client) opponentCount++;
-            if (board[x][y] == client && opponentCount > 0) return true;
-            i++;
-            x = p.x + i * idx, y = p.y + i * idy;
+            if (board[x][y] == client && opponentCount == 0) break;
+            if (board[x][y] == client && opponentCount > 0) {
+                directions.push_back({idx, idy});
+                break;
+            }
+            x += idx, y += idy;
         }
     }
-    return false;
+    auto move = Move{square, directions};
+    if (!directions.empty()) {
+        currentLegalMoves.push_back(move);
+    }
+    return {square, directions};
 }
 
-bool moveIsValid(Point move) {
+Move getMove(Point point) {
     // if there is already a disk here we can't place there
-    if (board[move.x][move.y] != 0) return false;
-    // check if there is a valid direction that can be played
-    return hasOppositeDisk(move, getSurroundingCoordinates(move));
+    if (board[point.x][point.y] != 0) return {};
+    // check if the move is in current legal moves
+    for (Move move : currentLegalMoves) {
+        if (point.x == move.square.x && point.y == move.square.y) {
+            return move;
+        }
+    }
+    return {};
 }
 
-std::vector<Point> getPossibleMoves() {
+std::vector<Move> getPossibleMoves() {
+    // if we already calculated all the legal moves for this turn return those
+    if (!currentLegalMoves.empty()) {
+        return currentLegalMoves;
+    }
+    std::vector<Move> moves;
     char client = clientIsWhite ? 2 : 1;
-    std::vector<Point> moves;
-
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
             if (board[i][j] == 0 || board[i][j] == client) continue;
 
             auto points = getSurroundingCoordinates({i, j});
             for (auto point : points) {
-                if (!moveIsValid(point)) continue;
-                moves.push_back(point);
+                if (board[point.x][point.y] != 0) continue;
+                Move move = getValidDirectionsForSquare(point);
+                if (move.directions.empty()) continue;
+                moves.push_back(move);
             }
         }
     }
@@ -121,9 +119,9 @@ void highLightPossibleMoves(Shader* shader) {
     float squareSize = 1.0f / (float)boardSize;
 
     auto possibleMoves = getPossibleMoves();
-    for (auto square : possibleMoves) {
-        float x = (-1 + squareSize) + (float)square.x * squareSize*2;
-        float y = (-1 + squareSize) + (float)square.y * squareSize*2;
+    for (const auto& move : possibleMoves) {
+        float x = (-1 + squareSize) + (float)move.square.x * squareSize*2;
+        float y = (-1 + squareSize) + (float)move.square.y * squareSize*2;
         shader->set("centre", glm::vec2(x,y));
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }

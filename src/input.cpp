@@ -26,9 +26,14 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     glfwGetCursorPos(window, &x, &y);
     auto cell = screenToCellCoords(x, y);
 
-    if (!moveIsValid(cell)) return;
-    playMove(cell);
+    Move move = getMove(cell);
+    if (move.directions.empty()) return;
+
+    // play the move
+    playMove(move);
     clientTurn = false;
+    // clear the current legal moves so they are refreshed
+    currentLegalMoves.clear();
 
     if (!playingLocal) return;
     clientTurn = true;

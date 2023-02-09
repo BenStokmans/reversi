@@ -9,9 +9,10 @@ int height = 800;
 
 bool playingLocal = true;
 bool clientTurn = true;
-bool clientIsWhite = true;
+bool clientIsWhite = false;
 int boardSize = 8;
 float gridLineWidth = 0.005f;
+std::vector<Move> currentLegalMoves;
 bool highlighted[8][8] = {};
 char board[8][8] = {};
 

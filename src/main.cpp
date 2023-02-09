@@ -17,12 +17,15 @@ int main() {
 
     initReversi();
 
+    LOG_SHADER_NAME(gridVert, gridFrag);
     Shader gridShader = Shader(gridVert, gridFrag);
     GLuint gridVertexArray = createGridVertexArray(&gridShader);
 
+    LOG_SHADER_NAME(circleVert, circleFrag);
     Shader circleShader = Shader(circleVert, circleFrag);
     GLuint diskVertexArray = createDiskVertexArray(&circleShader);
 
+    LOG_SHADER_NAME(squareVert, squareFrag);
     Shader squareShader = Shader(squareVert, squareFrag);
     GLuint squareVertexArray = createSquareVertexArray(&squareShader);
 
@@ -105,11 +108,15 @@ int main() {
         ImGui::NewFrame();
 
         ImGui::Begin("Debug", &showDebugWindow);
+        if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(ImGuiKey_Q)) {
+            glfwSetWindowShouldClose(glfwWindow, true);
+        }
+
         ImGui::Text("Turn: %s", clientTurn ? (clientIsWhite ? "white" : "black") : (clientIsWhite ? "black" : "white"));
         ImGui::Text("White disks: %d", whiteDisks);
         ImGui::Text("Black disks: %d", blackDisks);
-        ImGui::Checkbox("Client is white", &clientIsWhite);
-        ImGui::Checkbox("Client to play", &clientTurn);
+        if (ImGui::Checkbox("Client is white", &clientIsWhite)) currentLegalMoves.clear();
+        if (ImGui::Checkbox("Client to play", &clientTurn)) currentLegalMoves.clear();
         ImGui::End();
 
         ImGui::Render();

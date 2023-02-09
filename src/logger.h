@@ -86,8 +86,8 @@ private:
         exit(1); \
     }
 
-#define LOG_SHADER(x) \
-    logger.logShaderInfo(std::string() + #x, x);
+#define LOG_SHADER_NAME(x, y) STREAM_DEBUG("OpenGL", "loading shader: " << #x << ", " << #y)
+#define LOG_SHADER_INFO(x) logger.logShaderInfo(std::string() + #x, x);
 
 extern Logger logger;
 

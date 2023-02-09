@@ -6,8 +6,8 @@
 
 void initReversi();
 void highLightPossibleMoves(Shader* shader);
-void playMove(Point move);
-bool moveIsValid(Point move);
-std::vector<Point> getPossibleMoves();
+void playMove(const Move& move);
+Move getMove(Point point);
+std::vector<Move> getPossibleMoves();
 
 #endif //REVERSI_REVERSI_H

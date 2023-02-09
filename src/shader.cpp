@@ -15,8 +15,8 @@ Shader::Shader(const char *vertexSource, const char *fragmentSource) {
     glCompileShader(fragmentShader);
     
     // log any potential errors
-    LOG_SHADER(vertexShader)
-    LOG_SHADER(fragmentShader)
+    LOG_SHADER_INFO(vertexShader)
+    LOG_SHADER_INFO(fragmentShader)
 
     // link the program
     program = glCreateProgram();

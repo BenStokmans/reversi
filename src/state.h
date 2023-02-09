@@ -3,6 +3,16 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include <vector>
+
+struct Point {
+    int x,y;
+};
+
+struct Move {
+    Point square;
+    std::vector<Point> directions;
+};
 
 extern bool showDebugWindow;
 
@@ -16,6 +26,7 @@ extern bool clientTurn;
 extern bool clientIsWhite;
 extern int boardSize;
 extern float gridLineWidth;
+extern std::vector<Move> currentLegalMoves;
 extern bool highlighted[8][8];
 extern char board[8][8];
 
