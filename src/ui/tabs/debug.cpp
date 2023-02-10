@@ -11,7 +11,7 @@ void DebugTab::Draw() {
     int whiteDisks = 0, blackDisks = 0;
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
-            char side = board[i][j];
+            char side = gameBoard[i][j];
             if (side == 1) blackDisks++;
             if (side == 2) whiteDisks++;
         }
@@ -21,15 +21,5 @@ void DebugTab::Draw() {
     ImGui::Text("Black disks: %d", blackDisks);
     ImGui::Text("Game over: %s", gameOver ? "true" : "false");
 
-    ImGui::BeginDisabled(aiEnabled);
-
-    if (ImGui::Checkbox("Client is white", &clientIsWhite)) {
-        aiColor = clientIsWhite ? 1 : 2;
-        aiColorStr = clientIsWhite ? "Black" : "White";
-        currentLegalMoves.clear();
-    }
-    if (ImGui::Checkbox("Client to play", &clientTurn)) currentLegalMoves.clear();
-
-    ImGui::EndDisabled();
     ImGui::EndTabItem();
 }

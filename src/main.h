@@ -3,6 +3,7 @@
 
 #include "logger.h"
 #include "ui/shader.h"
+#include "ui/shaders.h"
 #include "ui/ui.h"
 #include "state.h"
 #include "ui/helper.h"

@@ -59,7 +59,7 @@ add_subdirectory(lib/glfw)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/glm)
 
-add_executable(reversi WIN32 MACOSX_BUNDLE src/main.cpp src/ui/shader.cpp src/ui/shader.h src/logger.cpp src/logger.h src/ui/ui.cpp src/ui/ui.h src/state.h src/game/input.cpp src/game/input.h src/state.cpp src/ui/shaders.h src/ui/helper.cpp src/ui/helper.h src/game/reversi.cpp src/game/reversi.h src/game/ai.cpp src/game/ai.h src/main.h src/ui/tabs/local.cpp src/ui/tabs/local.h src/ui/tabs/theme.cpp src/ui/tabs/theme.h src/ui/tabs/debug.cpp src/ui/tabs/debug.h src/ui/game.h src/ui/game.cpp src/ui/shaders.cpp)
+add_executable(reversi WIN32 MACOSX_BUNDLE src/main.cpp src/ui/shader.cpp src/ui/shader.h src/logger.cpp src/logger.h src/ui/ui.cpp src/ui/ui.h src/state.h src/game/input.cpp src/game/input.h src/state.cpp src/ui/shaders.h src/ui/helper.cpp src/ui/helper.h src/game/reversi.cpp src/game/reversi.h src/game/ai.cpp src/game/ai.h src/main.h src/ui/tabs/local.cpp src/ui/tabs/local.h src/ui/tabs/theme.cpp src/ui/tabs/theme.h src/ui/tabs/debug.cpp src/ui/tabs/debug.h src/ui/game.h src/ui/game.cpp src/ui/shaders.cpp src/game/board.cpp src/game/board.h src/ui/tabs/ai.cpp src/ui/tabs/ai.h include/int128.h)
 target_sources(reversi PRIVATE
         lib/imgui/imgui.cpp
         lib/imgui/imgui_draw.cpp

@@ -19,6 +19,9 @@ void UI::DrawUI() {
     }
 
     LocalTab::Draw();
+    if (gameMode == GameMode::AI || gameMode == GameMode::Local)
+        AITab::Draw();
+
     ThemeTab::Draw();
 #ifdef DEBUG
     DebugTab::Draw();
@@ -46,10 +49,12 @@ void UI::DrawGame(
     ) {
     cellShader->use();
     glBindVertexArray(cellVAO);
-
     // render highlighting
     highlightPossibleMoves(cellShader);
     highLightModified(cellShader);
+
+    if (showAiMove && !gameOver && gameMode == GameMode::Local)
+        showBestMove(cellShader, cellVAO, diskShader, diskVAO);
 
     // draw grid on top of the highlighted cells
     gridShader->use();

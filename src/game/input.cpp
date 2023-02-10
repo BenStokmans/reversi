@@ -29,21 +29,16 @@ void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, 
 
     // if the move has valid directions
     Move move = Game::GetMove(cell);
-    if (move.directions.empty()) return;
+    if (!move.isValid()) return;
 
     // play the move
-    Game::PlayMove(move);
-    if (!gameStarted) gameStarted = true;
+    Game::PlayMove(move, LOCAL_PLAYER);
 
-    // change player turn
-    clientTurn = !clientTurn;
-    if (!clientTurn && !aiEnabled)
-        currentLegalMoves.clear();
+    if (gameMode == GameMode::AI && !aiManual)
+        Game::AI::PlayBestMove();
 
-    if (aiEnabled && CURRENT_PLAYER == aiColor && !aiManual)
-        Game::AI::PlayBestMove(aiDifficulty, aiColor, aiDepth);
-
-    if (!playingLocal || aiEnabled) return;
-    clientTurn = true;
-    clientIsWhite = !clientIsWhite;
+    if (gameMode == GameMode::Local) {
+        clientTurn = true;
+        clientIsWhite = !clientIsWhite;
+    }
 }

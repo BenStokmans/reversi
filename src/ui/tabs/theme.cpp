@@ -37,5 +37,21 @@ void ThemeTab::Draw() {
                 (unsigned char)(highlightModifiedColorBuffer[3]*255.f)
         };
     }
+    ImGui::Separator();
+    float highlightAiBuffer[4] = {
+            (float)highlightAiColor.r / 255.f,
+            (float)highlightAiColor.g / 255.f,
+            (float)highlightAiColor.b / 255.f,
+            (float)highlightAiColor.a / 255.f
+    };
+    ImGui::Checkbox("Highlight AI suggestion", &highlightAiMove);
+    if (ImGui::ColorEdit4("3",highlightAiBuffer, ImGuiColorEditFlags_NoLabel)) {
+        highlightAiColor = {
+                (unsigned char)(highlightAiBuffer[0]*255.f),
+                (unsigned char)(highlightAiBuffer[1]*255.f),
+                (unsigned char)(highlightAiBuffer[2]*255.f),
+                (unsigned char)(highlightAiBuffer[3]*255.f)
+        };
+    }
     ImGui::EndTabItem();
 }

@@ -15,12 +15,12 @@
 #include "../game/input.h"
 #include "../state.h"
 #include "../game/ai.h"
-#include "shaders.h"
 
 #include "game.h"
 #include "tabs/local.h"
 #include "tabs/theme.h"
 #include "tabs/debug.h"
+#include "tabs/ai.h"
 
 namespace UI {
     void DrawGame(

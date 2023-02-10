@@ -19,9 +19,25 @@ struct Point {
     int x,y;
 };
 
+
 struct Move {
     Point cell;
     std::vector<Point> directions;
+    int gain{};
+    __int128 boardState{};
+
+    [[nodiscard]] bool isValid() const {
+        return gain != 0;
+    }
+    bool operator < (const Move& move) const {
+        return this->gain < move.gain;
+    }
+};
+
+enum GameMode : int {
+    Local,
+    AI,
+    Online,
 };
 
 enum AiDifficulty : int {
@@ -32,7 +48,9 @@ enum AiDifficulty : int {
 };
 
 // ai settings
-extern bool aiEnabled;
+extern bool showAiMove;
+extern Move cachedAiMove;
+
 extern bool aiManual;
 extern const char* aiDifficultyStr;
 extern AiDifficulty aiDifficulty;
@@ -57,8 +75,10 @@ extern int height;
 
 #define LOCAL_PLAYER clientIsWhite ? 2 : 1
 
+extern GameMode gameMode;
+extern const char* gameModeStr;
+
 extern bool gameStarted;
-extern bool playingLocal;
 extern bool clientTurn;
 extern bool clientIsWhite;
 extern int boardSize;
@@ -68,11 +88,13 @@ extern Color4 highlightPossibleColor;
 extern bool highlightPossibleCells;
 extern Color4 highlightModifiedColor;
 extern bool highlightModifiedCells;
+extern Color4 highlightAiColor;
+extern bool highlightAiMove;
 
 extern std::vector<Point> modifiedCells;
 extern std::vector<Move> currentLegalMoves;
 extern bool highlighted[8][8];
-extern char board[8][8];
+extern char gameBoard[8][8];
 
 extern GLFWwindow* glfwWindow;
 

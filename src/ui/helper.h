@@ -1,5 +1,5 @@
-#ifndef REVERSI_HELPER_H
-#define REVERSI_HELPER_H
+#ifndef REVERSI_UI_HELPER_H
+#define REVERSI_UI_HELPER_H
 
 #include "shader.h"
 #include "../state.h"
@@ -9,6 +9,5 @@ GLuint createDiskVertexArray(Shader* shader);
 GLuint createCellVertexArray(Shader* shader);
 
 Point screenToCellCoords(double x, double y);
-std::vector<Point> getSurroundingCoordinates(Point p);
 
-#endif //REVERSI_HELPER_H
+#endif //REVERSI_UI_HELPER_H

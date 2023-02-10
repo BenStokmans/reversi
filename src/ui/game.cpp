@@ -1,7 +1,7 @@
 #include "game.h"
 
 void drawDisks(Shader* shader) {
-    float diskSize = 2.0f / (float)boardSize;
+    float diskSize = 1.0f / (float)boardSize;
 
     double mouseX, mouseY;
     glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
@@ -10,13 +10,13 @@ void drawDisks(Shader* shader) {
     // draw all disks on the board and the hovered cell if it's our turn
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
-            char side = board[i][j];
+            char side = gameBoard[i][j];
 
             bool renderHover = i == hoverCell.x && j == hoverCell.y && clientTurn;
             if (side == 0 && !renderHover) continue;
 
-            float x = (-1 + diskSize / 2) + (float)i * diskSize;
-            float y = (-1 + diskSize / 2) + (float)j * diskSize;
+            float x = (-1 + diskSize) + (float)i * diskSize * 2;
+            float y = (-1 + diskSize) + (float)j * diskSize * 2;
 
             auto color = glm::vec4(0, 0, 0, 1.f);
             if (side == 2) {
@@ -70,7 +70,7 @@ void drawGameOver() {
     int whiteDisks = 0, blackDisks = 0;
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
-            char side = board[i][j];
+            char side = gameBoard[i][j];
             if (side == 1) blackDisks++;
             if (side == 2) whiteDisks++;
         }
@@ -78,4 +78,36 @@ void drawGameOver() {
     ImGui::Begin("Game over", &showWinWindow);
     ImGui::Text("%s has won the game!", whiteDisks > blackDisks ? "white" : "black");
     ImGui::End();
+}
+
+void showBestMove(Shader* cellShader, GLuint cellVAO, Shader* diskShader, GLuint diskVAO) {
+    aiColor = CURRENT_PLAYER;
+    Move move = cachedAiMove;
+    if (move.boardState != Game::Board::State(gameBoard)) {
+        move = Game::AI::GetBestMove();
+        cachedAiMove = move;
+    }
+
+    float cellSize = 1.0f / (float)boardSize;
+    float x = (-1 + cellSize) + (float)move.cell.x * cellSize * 2;
+    float y = (-1 + cellSize) + (float)move.cell.y * cellSize * 2;
+
+    if (highlightAiMove) {
+        cellShader->use();
+        glBindVertexArray(cellVAO);
+        cellShader->set("centre", glm::vec2(x, y));
+        cellShader->set("color", highlightAiColor);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
+
+    auto diskColor = glm::vec4(0, 0, 0, 0.5f);
+    if (CURRENT_PLAYER == 2) {
+        diskColor = glm::vec4(1, 1, 1, 0.5f);
+    }
+
+    diskShader->use();
+    glBindVertexArray(diskVAO);
+    diskShader->set("centre", glm::vec2(x, y));
+    diskShader->set("color", diskColor);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }

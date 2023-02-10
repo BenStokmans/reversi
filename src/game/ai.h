@@ -3,10 +3,18 @@
 
 #include <random>
 #include "reversi.h"
+#include "board.h"
+
+class SimulationContext {
+public:
+    SimulationContext();
+    std::vector<Move> GetPositionInfo();
+    char simBoard[8][8]{};
+};
 
 namespace Game::AI {
-    Move GetBestMove(AiDifficulty difficulty, char color, int depth = 0);
-    void PlayBestMove(AiDifficulty difficulty, char color, int depth = 0);
+    Move GetBestMove();
+    void PlayBestMove();
 
 }
 

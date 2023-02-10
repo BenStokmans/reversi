@@ -10,17 +10,25 @@ Move randomMove(const std::vector<Move>& moves) {
     return *start;
 }
 
-Move getBestMoveRandom(char color) {
-    auto moves = Game::GetPossibleMoves(color);
+Move getBestMoveRandom() {
+    auto moves = Game::GetPossibleMoves(aiColor);
+    if (moves.empty()) return {};
     return randomMove(moves);
 }
 
-Move Game::AI::GetBestMove(AiDifficulty difficulty, char color, int depth) {
-    switch (difficulty) {
+Move getBestMoveEasy() {
+    auto moves = Game::GetPossibleMoves(aiColor);
+    std::sort(moves.begin(), moves.end());
+    if (moves.empty()) return {};
+    return moves[moves.size()-1];
+}
+
+Move Game::AI::GetBestMove() {
+    switch (aiDifficulty) {
         case Random:
-            return getBestMoveRandom(color);
+            return getBestMoveRandom();
         case Easy:
-            break;
+            return getBestMoveEasy();
         case Average:
             break;
         case Difficult:
@@ -29,9 +37,32 @@ Move Game::AI::GetBestMove(AiDifficulty difficulty, char color, int depth) {
     return {};
 }
 
-void Game::AI::PlayBestMove(AiDifficulty difficulty, char color, int depth) {
-    Move m = Game::AI::GetBestMove(aiDifficulty, aiColor, aiDepth);
-    Game::PlayMove(m);
-    clientTurn = true;
+void Game::AI::PlayBestMove() {
+    Move m = Game::AI::GetBestMove();
+    Game::PlayMove(m, aiColor);
 }
 
+SimulationContext::SimulationContext() {
+    std::memcpy(this->simBoard, gameBoard, sizeof(simBoard));
+}
+
+std::vector<Move> SimulationContext::GetPositionInfo() {
+    std::vector<Move> moves;
+    auto boardState = Game::Board::State(this->simBoard);
+
+    for (int i = 0; i < boardSize; i++) {
+        for (int j = 0; j < boardSize; j++) {
+            if (this->simBoard[i][j] == 0 || this->simBoard[i][j] == aiColor) continue;
+
+            auto points = Game::Board::GetSurroundingCoordinates({i, j});
+            for (auto point : points) {
+                if (this->simBoard[point.x][point.y] != 0) continue;
+                Move move = Game::Board::GetValidDirectionsForCell(point, this->simBoard, aiColor);
+                if (!move.isValid()) continue;
+                move.boardState = boardState;
+                moves.push_back(move);
+            }
+        }
+    }
+    return moves;
+}

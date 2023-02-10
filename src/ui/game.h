@@ -4,6 +4,7 @@
 #include "ui.h"
 
 void drawGameOver();
+void showBestMove(Shader* cellShader, GLuint cellVAO, Shader* diskShader, GLuint diskVAO);
 void drawDisks(Shader* shader);
 void highlightPossibleMoves(Shader* shader);
 void highLightModified(Shader* shader);
