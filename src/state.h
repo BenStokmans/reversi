@@ -24,7 +24,7 @@ struct Move {
     Point cell;
     std::vector<Point> directions;
     int gain{};
-    long boardHash{};
+    unsigned long boardHash{};
 
     [[nodiscard]] bool isValid() const {
         return gain != 0;
@@ -44,12 +44,16 @@ enum AiDifficulty : int {
     Random,
     Easy,
     Average,
-    Difficult,
+    Hard,
 };
 
 // ai settings
 extern bool showAiMove;
 extern Move cachedAiMove;
+extern int aiDiskMul;
+extern int aiEdgeDiskMul;
+extern int aiAdjacentCornerDiskMul;
+extern int aiCornerDiskMul;
 
 extern bool aiManual;
 extern const char* aiDifficultyStr;

@@ -15,6 +15,8 @@ namespace Game::Board {
     unsigned __int128 State(char board[8][8]);
 #endif
     unsigned long Hash(char board[8][8]);
+
+    void PlayMove(const Move &move, char color, char boar[8][8]);
 }
 
 #endif //REVERSI_BOARD_H

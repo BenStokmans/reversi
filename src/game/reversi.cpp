@@ -32,6 +32,7 @@ void Game::Init() {
     gameBoard[4][4] = 1;
 }
 
+// TODO: clean up duplicate logic
 void Game::PlayMove(const Move& move, char color) {
     if (!move.isValid()) return;
     if (!gameStarted)
@@ -44,7 +45,7 @@ void Game::PlayMove(const Move& move, char color) {
         int dx = direction.x, dy = direction.y;
         int x = move.cell.x + dx, y = move.cell.y + dy;
 
-        while (x > -1 && x < boardSize && y > 0 && y < boardSize) {
+        while (x > -1 && x < boardSize && y > -1 && y < boardSize) {
             // if we encounter an empty space this direction is automatically invalid
             if (gameBoard[x][y] == 0) break;
             if (gameBoard[x][y] == color) break;

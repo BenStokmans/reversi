@@ -1,5 +1,23 @@
 #include "board.h"
 
+void Game::Board::PlayMove(const Move& move, char color, char board[8][8]) {
+    for (auto direction : move.directions) {
+        int dx = direction.x, dy = direction.y;
+        int x = move.cell.x + dx, y = move.cell.y + dy;
+
+        while (x > -1 && x < boardSize && y > -1 && y < boardSize) {
+            // if we encounter an empty space this direction is automatically invalid
+            if (board[x][y] == 0) break;
+            if (board[x][y] == color) break;
+            if (board[x][y] != color) {
+                board[x][y] = color;
+            }
+            x += dx, y += dy;
+        }
+    }
+    board[move.cell.x][move.cell.y] = color;
+}
+
 std::vector<Point> Game::Board::GetSurroundingCoordinates(Point p) {
     std::vector<Point> points;
     for (int dx = -1; dx <= 1; dx++) {

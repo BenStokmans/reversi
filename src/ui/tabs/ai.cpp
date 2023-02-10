@@ -5,7 +5,7 @@ void AITab::Draw() {
         return;
 
     ImGui::Dummy(ImVec2(4,4));
-    const char* aiItems[] = { "Random", "Easy", "Normal", "Difficult" };
+    const char* aiItems[] = { "Random", "Easy", "Normal", "Hard" };
     if (ImGui::BeginCombo("AI difficulty", aiDifficultyStr)) {
         for (int n = 0; n < IM_ARRAYSIZE(aiItems); n++)
         {
@@ -20,8 +20,8 @@ void AITab::Draw() {
         }
         ImGui::EndCombo();
     }
-    ImGui::BeginDisabled(aiDifficulty == AiDifficulty::Random || aiDifficulty == AiDifficulty::Easy);
-    ImGui::SliderInt("Depth", &aiDepth, 1, 30, "%d", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::BeginDisabled(aiDifficulty != AiDifficulty::Hard);
+    ImGui::SliderInt("Depth", &aiDepth, 1, 6, "%d", ImGuiSliderFlags_AlwaysClamp);
     ImGui::EndDisabled();
 
     ImGui::Separator();

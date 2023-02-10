@@ -2,6 +2,10 @@
 
 bool showAiMove = false;
 Move cachedAiMove = {};
+int aiDiskMul = 2;
+int aiEdgeDiskMul = 3;
+int aiAdjacentCornerDiskMul = 1;
+int aiCornerDiskMul = 6;
 
 bool aiManual = false;
 const char* aiDifficultyStr = "Random";
@@ -10,7 +14,6 @@ const char* aiColorStr = "White";
 char aiColor = 2; // white
 int aiDepth = 1;
 
-bool showDebugWindow = true;
 bool showGameWindow = true;
 bool showWinWindow = true;
 bool winWindowFocus = true;
