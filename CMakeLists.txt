@@ -51,7 +51,9 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui)
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui/backends)
-
+if (WIN32)
+    include_directories(${PROJECT_SOURCE_DIR}/lib/uint128_t)
+endif()
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only" )
 set(GLFW_INSTALL OFF CACHE BOOL "GLFW lib only")
 
@@ -69,6 +71,9 @@ target_sources(reversi PRIVATE
         lib/imgui/backends/imgui_impl_opengl3.cpp
         lib/imgui/backends/imgui_impl_glfw.cpp
         )
+if (WIN32)
+    target_sources(reversi PRIVATE lib/uint128_t/uint128_t.cpp)
+endif()
 target_link_libraries(reversi PRIVATE glfw)
 target_link_libraries(reversi PRIVATE glad)
 target_link_libraries(reversi PRIVATE glm)

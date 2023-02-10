@@ -47,10 +47,16 @@ Move Game::Board::GetValidDirectionsForCell(Point cell, char board[8][8], char c
     return move;
 }
 
-// TODO: Check if this also works on windows
-__int128 Game::Board::State(char board[8][8]) {
-    long mask = 0;
-    long value = 0;
+// We use a 128-bit integer here to represent the board by using the 64 high bits as a mask defining whether there
+// is a disk on a certain square or not. The 64 low bits are used to represent the color. The State method creates the
+// mask and the value integers separately and then merges them into one 128-bit integer. The hash methods uses
+// bit mixing to merge the high and low bits into one 64-bit unsigned integer which we use as a unique representation
+// of the board state for caching etc.
+// note: MSVC does not have __int128 like GCC, so we have to use an external library instead.
+#ifdef WIN32
+uint128_t Game::Board::State(char board[8][8]) {
+    unsigned long mask = 0;
+    unsigned long value = 0;
 
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
@@ -63,8 +69,8 @@ __int128 Game::Board::State(char board[8][8]) {
             value ^= ((val == 1 ? 0 : 1) << index);
         }
     }
-    __int128 state = 0;
-    state ^= ((__int128)mask) << 64;
+    uint128_t state = 0;
+    state ^= ((uint128_t)mask) << 64;
     state ^= value;
 
     return state;
@@ -72,13 +78,49 @@ __int128 Game::Board::State(char board[8][8]) {
 
 // we have to initialize these like this because the compiler doesn't allow constants larger than the max value of a
 // 64-bit unsigned integer
-__int128 a = (((__int128)0x1D15F8C153AB3B6BUL) << 64) | 0x6E6E63F10BD4FD48UL;
-__int128 b = (((__int128)0x06B265B3CC88EF3BUL) << 64) | 0xE56FFC797D5D431DUL;
-__int128 c = (((__int128)0xB8F238E50CC7CACCUL) << 64) | 0xFC27CCEEFE6D02BBUL;
+uint128_t a = (((uint128_t)0x1D15F8C153AB3B6BUL) << 64) | 0x6E6E63F10BD4FD48UL;
+uint128_t b = (((uint128_t)0x06B265B3CC88EF3BUL) << 64) | 0xE56FFC797D5D431DUL;
+uint128_t c = (((uint128_t)0xB8F238E50CC7CACCUL) << 64) | 0xFC27CCEEFE6D02BBUL;
 
-long Game::Board::Hash(char board[8][8]) {
-    __int128 state = State(board);
-    auto low = (long)state;
-    auto high = (long)(state >> 64);
-    return (long)((a * low + b * high + c) >> 64);
+unsigned long Game::Board::Hash(char board[8][8]) {
+    uint128_t state = State(board);
+    auto low = (uint64_t)state;
+    auto high = (uint64_t)(state >> 64);
+    return (uint64_t)((a * low + b * high + c) >> 64);
 }
+#else
+unsigned __int128 Game::Board::State(char board[8][8]) {
+    unsigned long mask = 0;
+    unsigned long value = 0;
+
+    for (int i = 0; i < boardSize; i++) {
+        for (int j = 0; j < boardSize; j++) {
+            char val = board[i][j];
+            int index = i * boardSize + j;
+
+            // set mask bit if there is a disk on the square
+            mask ^= ((val == 0 ? 0 : 1) << index);
+            // set hash bit for the color of the disk
+            value ^= ((val == 1 ? 0 : 1) << index);
+        }
+    }
+    unsigned __int128 state = 0;
+    state ^= ((unsigned __int128)mask) << 64;
+    state ^= value;
+
+    return state;
+}
+
+// we have to initialize these like this because the compiler doesn't allow constants larger than the max value of a
+// 64-bit unsigned integer
+unsigned __int128 a = (((__int128)0x1D15F8C153AB3B6BUL) << 64) | 0x6E6E63F10BD4FD48UL;
+unsigned __int128 b = (((__int128)0x06B265B3CC88EF3BUL) << 64) | 0xE56FFC797D5D431DUL;
+unsigned __int128 c = (((__int128)0xB8F238E50CC7CACCUL) << 64) | 0xFC27CCEEFE6D02BBUL;
+
+unsigned long Game::Board::Hash(char board[8][8]) {
+    unsigned __int128 state = State(board);
+    auto low = (unsigned long)state;
+    auto high = (unsigned long)(state >> 64);
+    return (unsigned long)((a * low + b * high + c) >> 64);
+}
+#endif
