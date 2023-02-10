@@ -48,7 +48,7 @@ SimulationContext::SimulationContext() {
 
 std::vector<Move> SimulationContext::GetPositionInfo() {
     std::vector<Move> moves;
-    auto boardState = Game::Board::State(this->simBoard);
+    auto boardState = Game::Board::Hash(this->simBoard);
 
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
@@ -59,7 +59,7 @@ std::vector<Move> SimulationContext::GetPositionInfo() {
                 if (this->simBoard[point.x][point.y] != 0) continue;
                 Move move = Game::Board::GetValidDirectionsForCell(point, this->simBoard, aiColor);
                 if (!move.isValid()) continue;
-                move.boardState = boardState;
+                move.boardHash = boardState;
                 moves.push_back(move);
             }
         }

@@ -85,7 +85,7 @@ std::vector<Move> Game::GetPossibleMoves(char color) {
         return currentLegalMoves;
     }
 
-    auto boardState = Board::State(gameBoard);
+    auto boardState = Board::Hash(gameBoard);
     std::vector<Move> moves;
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
@@ -96,7 +96,7 @@ std::vector<Move> Game::GetPossibleMoves(char color) {
                 if (gameBoard[point.x][point.y] != 0) continue;
                 Move move = Board::GetValidDirectionsForCell(point, gameBoard, color);
                 if (!move.isValid()) continue;
-                move.boardState = boardState;
+                move.boardHash = boardState;
                 moves.push_back(move);
             }
         }

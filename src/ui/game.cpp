@@ -83,7 +83,7 @@ void drawGameOver() {
 void showBestMove(Shader* cellShader, GLuint cellVAO, Shader* diskShader, GLuint diskVAO) {
     aiColor = CURRENT_PLAYER;
     Move move = cachedAiMove;
-    if (move.boardState != Game::Board::State(gameBoard)) {
+    if (move.boardHash != Game::Board::Hash(gameBoard)) {
         move = Game::AI::GetBestMove();
         cachedAiMove = move;
     }

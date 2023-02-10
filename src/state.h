@@ -24,7 +24,7 @@ struct Move {
     Point cell;
     std::vector<Point> directions;
     int gain{};
-    __int128 boardState{};
+    long boardHash{};
 
     [[nodiscard]] bool isValid() const {
         return gain != 0;

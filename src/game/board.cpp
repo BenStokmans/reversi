@@ -49,8 +49,8 @@ Move Game::Board::GetValidDirectionsForCell(Point cell, char board[8][8], char c
 
 // TODO: Check if this also works on windows
 __int128 Game::Board::State(char board[8][8]) {
-    unsigned long mask = 0;
-    unsigned long value = 0;
+    long mask = 0;
+    long value = 0;
 
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
@@ -68,4 +68,17 @@ __int128 Game::Board::State(char board[8][8]) {
     state ^= value;
 
     return state;
+}
+
+// we have to initialize these like this because the compiler doesn't allow constants larger than the max value of a
+// 64-bit unsigned integer
+__int128 a = (((__int128)0x1D15F8C153AB3B6BUL) << 64) | 0x6E6E63F10BD4FD48UL;
+__int128 b = (((__int128)0x06B265B3CC88EF3BUL) << 64) | 0xE56FFC797D5D431DUL;
+__int128 c = (((__int128)0xB8F238E50CC7CACCUL) << 64) | 0xFC27CCEEFE6D02BBUL;
+
+long Game::Board::Hash(char board[8][8]) {
+    __int128 state = State(board);
+    auto low = (long)state;
+    auto high = (long)(state >> 64);
+    return (long)((a * low + b * high + c) >> 64);
 }
