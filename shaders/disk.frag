@@ -13,6 +13,7 @@ void main() {
     if (dist >= radius) {
         discard;
     }
-
-    fragColor = color;
+    float delta = fwidth(dist);
+    float alpha = smoothstep(radius-delta, radius, dist);
+    fragColor = vec4(color.x, color.y, color.z, clamp(color.w-alpha, 0, 1));
 }
