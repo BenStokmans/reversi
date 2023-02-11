@@ -70,7 +70,9 @@ Move Game::Board::GetValidDirectionsForCell(Point cell, char board[8][8], char c
 // mask and the value integers separately and then merges them into one 128-bit integer. The hash methods uses
 // bit mixing to merge the high and low bits into one 64-bit unsigned integer which we use as a unique representation
 // of the board state for caching etc.
-// note: MSVC does not have __int128 like GCC, so we have to use an external library instead.
+// note 1: MSVC does not have __int128 like GCC, so we have to use an external library instead.
+// note 2: right now we represent the board in 128 bits, but we should be able to theoretically represent it in
+// 64log2(3)≈102 bits.
 #ifdef WIN32
 uint128_t Game::Board::State(char board[8][8]) {
     unsigned long mask = 0;

@@ -2,10 +2,11 @@
 
 bool showAiMove = false;
 Move cachedAiMove = {};
-int aiDiskMul = 2;
-int aiEdgeDiskMul = 3;
-int aiAdjacentCornerDiskMul = 1;
-int aiCornerDiskMul = 6;
+
+int aiDiskMul = 4; // weight = 1
+int aiEdgeDiskMul = 6; // weight = 1.5
+int aiAdjacentCornerDiskMul = 3; // weight = 0.75
+int aiCornerDiskMul = 10; // weight = 2.5
 
 bool aiManual = false;
 const char* aiDifficultyStr = "Random";

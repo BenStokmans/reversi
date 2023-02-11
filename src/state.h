@@ -17,6 +17,9 @@ struct Color4 {
 
 struct Point {
     int x,y;
+    bool operator == (const Point& point) const {
+        return this->x == point.x && this->y == point.y;
+    }
 };
 
 

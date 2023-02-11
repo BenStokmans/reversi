@@ -21,7 +21,7 @@ void AITab::Draw() {
         ImGui::EndCombo();
     }
     ImGui::BeginDisabled(aiDifficulty != AiDifficulty::Hard);
-    ImGui::SliderInt("Depth", &aiDepth, 1, 6, "%d", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::SliderInt("Depth", &aiDepth, 1, 10, "%d", ImGuiSliderFlags_AlwaysClamp);
     ImGui::EndDisabled();
 
     ImGui::Separator();

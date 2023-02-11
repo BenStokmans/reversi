@@ -1,14 +1,29 @@
 #include "ai.h"
 
+// maybe use a BST instead of an unordered map
+// TODO: add optimised depth caching
+std::unordered_map<unsigned long, int> maxCache;
+std::unordered_map<unsigned long, int> minCache;
+
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "misc-no-recursion"
 // TODO: Implement quiescence search in the future.
 int minmax(SimulationContext* context, int alpha, int beta, int depth, bool max) {
-    if (depth == 0 || context->GameOver()) {
+    if (depth == 0) {
         return context->Eval();
     }
+    // TODO: find out if max and min here are too strong as weight
+    if (context->GameOver()) {
+        return context->Eval() > 0 ? std::numeric_limits<int>::max() : std::numeric_limits<int>::min();
+    }
 
+    unsigned long boardHash = Game::Board::Hash(context->simBoard);
     if (max) {
+        auto cachedMax = maxCache.find(boardHash);
+        if (cachedMax != maxCache.end()) {
+            return cachedMax->second;
+        }
+
         int maxEval = std::numeric_limits<int>::min();
         for (const auto& move : context->GetMovesForPosition()) {
             auto moveCtx = context->NewPositionFromMove(move);
@@ -21,7 +36,13 @@ int minmax(SimulationContext* context, int alpha, int beta, int depth, bool max)
             if (beta <= alpha)
                 break;
         }
+        maxCache.insert({boardHash, maxEval});
         return maxEval;
+    }
+
+    auto cachedMin = minCache.find(boardHash);
+    if (cachedMin != minCache.end()) {
+        return cachedMin->second;
     }
 
     int minEval = std::numeric_limits<int>::max();
@@ -36,6 +57,7 @@ int minmax(SimulationContext* context, int alpha, int beta, int depth, bool max)
         if (beta <= alpha)
             break;
     }
+    minCache.insert({boardHash, minEval});
     return minEval;
 }
 #pragma clang diagnostic pop
