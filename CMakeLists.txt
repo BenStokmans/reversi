@@ -1,6 +1,14 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.19)
+include(CheckCCompilerFlag)
 
 project(reversi)
+
+set(CMAKE_REQUIRED_LINK_OPTIONS "-arch;arm64")
+check_c_compiler_flag("-arch arm64" arm64)
+if (arm64)
+    message("targeting arm64")
+    set(CMAKE_OSX_ARCHITECTURES "arm64")
+endif()
 
 # set output name for shader resources
 set(output_header "src/ui/shaders.h")
