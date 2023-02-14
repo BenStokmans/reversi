@@ -17,7 +17,7 @@
 #include "../game/ai.h"
 
 #include "game.h"
-#include "tabs/local.h"
+#include "tabs/game.h"
 #include "tabs/theme.h"
 #include "tabs/debug.h"
 #include "tabs/ai.h"

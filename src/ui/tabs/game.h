@@ -1,5 +1,5 @@
-#ifndef REVERSI_LOCAL_H
-#define REVERSI_LOCAL_H
+#ifndef REVERSI_GAME_TAB_H
+#define REVERSI_GAME_TAB_H
 
 #include "imgui.h"
 #include "../../game/reversi.h"
@@ -9,4 +9,4 @@ namespace LocalTab {
     void Draw();
 }
 
-#endif //REVERSI_LOCAL_H
+#endif //REVERSI_GAME_TAB_H

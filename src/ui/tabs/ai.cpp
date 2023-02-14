@@ -7,8 +7,7 @@ void AITab::Draw() {
     ImGui::Dummy(ImVec2(4,4));
     const char* aiItems[] = { "Random", "Easy", "Normal", "Hard" };
     if (ImGui::BeginCombo("AI difficulty", aiDifficultyStr)) {
-        for (int n = 0; n < IM_ARRAYSIZE(aiItems); n++)
-        {
+        for (int n = 0; n < IM_ARRAYSIZE(aiItems); n++) {
             bool selected = (aiDifficultyStr == aiItems[n]);
             if (ImGui::Selectable(aiItems[n], selected)) {
                 aiDifficultyStr = aiItems[n];
@@ -42,8 +41,7 @@ void AITab::Draw() {
 
     const char* colorItems[] = { "Black", "White" };
     if (ImGui::BeginCombo("AI Color", aiColorStr)) {
-        for (int n = 0; n < IM_ARRAYSIZE(colorItems); n++)
-        {
+        for (int n = 0; n < IM_ARRAYSIZE(colorItems); n++) {
             bool selected = (aiColorStr == colorItems[n]);
             if (ImGui::Selectable(colorItems[n], selected)) {
                 aiColorStr = colorItems[n];
