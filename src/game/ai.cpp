@@ -2,22 +2,22 @@
 
 // maybe use a BST instead of an unordered map
 // TODO: add optimised depth caching
-std::unordered_map<unsigned long, int> maxCache;
-std::unordered_map<unsigned long, int> minCache;
+std::unordered_map<uint64_t, int> maxCache;
+std::unordered_map<uint64_t, int> minCache;
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "misc-no-recursion"
 // TODO: Implement quiescence search in the future.
-int minmax(SimulationContext* context, int alpha, int beta, int depth, bool max) {
+int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
     if (depth == 0) {
-        return context->Eval();
+        return board.Eval(max);
     }
     // TODO: find out if max and min here are too strong as weight
-    if (context->GameOver()) {
-        return context->Eval() > 0 ? std::numeric_limits<int>::max() : std::numeric_limits<int>::min();
+    if (board.GameOver()) {
+        return board.Eval(max) > 0 ? std::numeric_limits<int>::max() : std::numeric_limits<int>::min();
     }
 
-    unsigned long boardHash = Game::Board::Hash(context->simBoard);
+    unsigned long boardHash = board.Hash();
     if (max) {
         auto cachedMax = maxCache.find(boardHash);
         if (cachedMax != maxCache.end()) {
@@ -25,16 +25,28 @@ int minmax(SimulationContext* context, int alpha, int beta, int depth, bool max)
         }
 
         int maxEval = std::numeric_limits<int>::min();
-        for (const auto& move : context->GetMovesForPosition()) {
-            auto moveCtx = context->NewPositionFromMove(move);
-            int eval = minmax(&moveCtx, alpha, beta, depth - 1, false);
-            if (eval > maxEval)
-                maxEval = eval;
-            if (eval > alpha)
-                alpha = eval;
-            // prune any upcoming positions as we have found the best possibility for this branch
-            if (beta <= alpha)
-                break;
+        uint64_t moves = board.Moves();
+        for (uint_fast8_t y = 0; y < 8; y++) {
+            bool b = false;
+            for (uint_fast8_t x = 0; x < 8; x++) {
+                uint_fast8_t place = y * 8 + x;
+                uint64_t cell = 1ULL << place;
+                if ((cell & moves) == 0) continue;
+
+                FastBoard local = board.Clone();
+                local.Play(place);
+                int eval = minmax(local, alpha, beta, depth - 1, false);
+                if (eval > maxEval)
+                    maxEval = eval;
+                if (eval > alpha)
+                    alpha = eval;
+                // prune any upcoming positions as we have found the best possibility for this branch
+                if (beta <= alpha) {
+                    b = true;
+                    break;
+                }
+            }
+            if (b) break;
         }
         maxCache.insert({boardHash, maxEval});
         return maxEval;
@@ -46,17 +58,30 @@ int minmax(SimulationContext* context, int alpha, int beta, int depth, bool max)
     }
 
     int minEval = std::numeric_limits<int>::max();
-    for (const auto& move : context->GetMovesForPosition()) {
-        auto moveCtx = context->NewPositionFromMove(move);
-        int eval = minmax(&moveCtx, alpha, beta, depth - 1, true);
-        if (eval < minEval)
-            minEval = eval;
-        if (eval < beta)
-            beta = eval;
-        // same here
-        if (beta <= alpha)
-            break;
+    uint64_t moves = board.Moves();
+    for (uint_fast8_t y = 0; y < 8; y++) {
+        bool b = false;
+        for (uint_fast8_t x = 0; x < 8; x++) {
+            uint_fast8_t place = y * 8 + x;
+            uint64_t cell = 1ULL << place;
+            if ((cell & moves) == 0) continue;
+
+            FastBoard local = board.Clone();
+            local.Play(place);
+            int eval = minmax(local, alpha, beta, depth - 1, true);
+            if (eval < minEval)
+                minEval = eval;
+            if (eval < beta)
+                beta = eval;
+            // prune any upcoming positions as we have found the best possibility for this branch
+            if (beta <= alpha) {
+                b = true;
+                break;
+            }
+        }
+        if (b) break;
     }
+
     minCache.insert({boardHash, minEval});
     return minEval;
 }
@@ -67,20 +92,47 @@ Move getMoveMinMax(SimulationContext* context, int depth) {
     int alpha = std::numeric_limits<int>::min();
     int beta = std::numeric_limits<int>::max();
 
-    Move bestMove;
-    for (const auto& move : context->GetMovesForPosition()) {
-        auto moveCtx = context->NewPositionFromMove(move);
-        int eval = minmax(&moveCtx, alpha, beta, depth - 1, false);
-        if (eval > maxEval) {
-            maxEval = eval;
-            bestMove = move;
+    Point bestCell{};
+    FastBoard board;
+    for (int y = 0; y < 8; y++) {
+        for (int x = 0; x < 8; x++) {
+            if (context->simBoard[x][y] == 0) continue;
+            uint_fast8_t place = y * 8 + x;
+            uint64_t cell = 1ULL << place;
+            if (context->simBoard[x][y] == context->playerColor) {
+                board.player |= cell;
+                continue;
+            }
+            board.opponent |= cell;
         }
-        if (eval > alpha)
-            alpha = eval;
-        if (beta <= alpha)
-            break;
     }
-    return bestMove;
+
+    uint64_t moves = board.Moves();
+    for (uint_fast8_t y = 0; y < 8; y++) {
+        bool b = false;
+        for (uint_fast8_t x = 0; x < 8; x++) {
+            uint_fast8_t place = y * 8 + x;
+            uint64_t cell = 1ULL << place;
+            if ((cell & moves) == 0) continue;
+
+            FastBoard local = board.Clone();
+            local.Play(place);
+            int eval = minmax(local, alpha, beta, depth - 1, false);
+            if (eval > maxEval) {
+                maxEval = eval;
+                bestCell = {x, y};
+            }
+            if (eval > alpha)
+                alpha = eval;
+            // prune any upcoming positions as we have found the best possibility for this branch
+            if (beta <= alpha) {
+                b = true;
+                break;
+            }
+        }
+        if (b) break;
+    }
+    return Game::Board::GetValidDirectionsForCell(bestCell, context->simBoard, context->colorToPlay);
 }
 
 Move randomMove(const std::vector<Move>& moves) {
@@ -149,73 +201,4 @@ SimulationContext::SimulationContext(char startColor, char board[8][8]) {
     std::memcpy(this->simBoard, board, sizeof(simBoard));
     this->playerColor = startColor;
     this->colorToPlay = startColor;
-}
-
-SimulationContext::SimulationContext(SimulationContext *context) {
-    std::memcpy(this->simBoard, context->simBoard, sizeof(simBoard));
-    this->playerColor = context->playerColor;
-    this->colorToPlay = context->colorToPlay;
-}
-
-std::vector<Move> SimulationContext::GetMovesForPosition() {
-    std::vector<Move> moves;
-    auto boardState = Game::Board::Hash(this->simBoard);
-
-    for (int i = 0; i < boardSize; i++) {
-        for (int j = 0; j < boardSize; j++) {
-            if (this->simBoard[i][j] == 0 || this->simBoard[i][j] == colorToPlay) continue;
-
-            auto points = Game::Board::GetSurroundingCoordinates({i, j});
-            for (auto point : points) {
-                if (this->simBoard[point.x][point.y] != 0) continue;
-                Move move = Game::Board::GetValidDirectionsForCell(point, this->simBoard, colorToPlay);
-                if (!move.isValid()) continue;
-                move.boardHash = boardState;
-                moves.push_back(move);
-            }
-        }
-    }
-    return moves;
-}
-
-bool SimulationContext::GameOver() {
-    return this->GetMovesForPosition().empty();
-}
-
-SimulationContext SimulationContext::NewPositionFromMove(const Move& move) {
-    SimulationContext newContext(this);
-    newContext.PlayMove(move);
-    return newContext;
-}
-
-void SimulationContext::PlayMove(const Move& move) {
-    Game::Board::PlayMove(move, this->colorToPlay, this->simBoard);
-    this->SwitchTurn();
-}
-
-int SimulationContext::Eval() {
-    int whiteDiskEval = 0, blackDiskEval = 0;
-    for (int i = 0; i < boardSize; i++) {
-        for (int j = 0; j < boardSize; j++) {
-            char side = this->simBoard[i][j];
-            int mul = aiDiskMul;
-            // favor edge cells
-            if (i == 0 || i == boardSize-1 || j == 0 || j == boardSize-1)
-                mul = aiEdgeDiskMul;
-            // favor corner cells over edge cells
-            if ((i == 0 && j == 0) || (i == boardSize-1 && j == boardSize-1))
-                mul = aiCornerDiskMul;
-            // prioritise not blocking player by playing next to corners
-            if (((i == 0 || i == boardSize-1) && (j == 1 || j == boardSize-2)) ||
-                ((j == 0 || j == boardSize-1) && (i == 1 || i == boardSize-2)) ||
-                ((i == 1 || i == boardSize-2) && (j == 1 || j == boardSize-2)))
-                mul = aiAdjacentCornerDiskMul;
-
-            if (side == 1)
-                blackDiskEval += mul;
-            if (side == 2)
-                whiteDiskEval += mul;
-        }
-    }
-    return playerColor == 1 ? blackDiskEval - whiteDiskEval : whiteDiskEval - blackDiskEval;
 }

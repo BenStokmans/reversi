@@ -9,5 +9,4 @@ namespace DebugTab {
     void Draw();
 }
 
-
 #endif //REVERSI_DEBUG_H

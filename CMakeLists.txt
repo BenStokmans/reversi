@@ -59,9 +59,8 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui)
 include_directories(${PROJECT_SOURCE_DIR}/lib/imgui/backends)
-if (WIN32)
-    include_directories(${PROJECT_SOURCE_DIR}/lib/uint128_t)
-endif()
+include_directories(${PROJECT_SOURCE_DIR}/lib/uint128_t)
+
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only" )
 set(GLFW_INSTALL OFF CACHE BOOL "GLFW lib only")
 
@@ -69,7 +68,7 @@ add_subdirectory(lib/glfw)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/glm)
 
-add_executable(reversi WIN32 MACOSX_BUNDLE src/main.cpp src/ui/shader.cpp src/ui/shader.h src/logger.cpp src/logger.h src/ui/ui.cpp src/ui/ui.h src/state.h src/game/input.cpp src/game/input.h src/state.cpp src/ui/shaders.h src/ui/helper.cpp src/ui/helper.h src/game/reversi.cpp src/game/reversi.h src/game/ai.cpp src/game/ai.h src/main.h src/ui/tabs/local.cpp src/ui/tabs/local.h src/ui/tabs/theme.cpp src/ui/tabs/theme.h src/ui/tabs/debug.cpp src/ui/tabs/debug.h src/ui/game.h src/ui/game.cpp src/ui/shaders.cpp src/game/board.cpp src/game/board.h src/ui/tabs/ai.cpp src/ui/tabs/ai.h)
+add_executable(reversi WIN32 MACOSX_BUNDLE src/main.cpp src/ui/shader.cpp src/ui/shader.h src/logger.cpp src/logger.h src/ui/ui.cpp src/ui/ui.h src/state.h src/game/input.cpp src/game/input.h src/state.cpp src/ui/shaders.h src/ui/helper.cpp src/ui/helper.h src/game/reversi.cpp src/game/reversi.h src/game/ai.cpp src/game/ai.h src/main.h src/ui/tabs/local.cpp src/ui/tabs/local.h src/ui/tabs/theme.cpp src/ui/tabs/theme.h src/ui/tabs/debug.cpp src/ui/tabs/debug.h src/ui/game.h src/ui/game.cpp src/ui/shaders.cpp src/game/board.cpp src/game/board.h src/ui/tabs/ai.cpp src/ui/tabs/ai.h src/game/fastboard/fastboard.cpp src/game/fastboard/fastboard.h src/game/fastboard/edges.cpp src/game/fastboard/edges.h src/game/fastboard/flip.cpp src/game/fastboard/flip.h src/game/fastboard/moves.cpp src/game/fastboard/moves.h)
 target_sources(reversi PRIVATE
         lib/imgui/imgui.cpp
         lib/imgui/imgui_draw.cpp
@@ -79,9 +78,8 @@ target_sources(reversi PRIVATE
         lib/imgui/backends/imgui_impl_opengl3.cpp
         lib/imgui/backends/imgui_impl_glfw.cpp
         )
-if (WIN32)
-    target_sources(reversi PRIVATE lib/uint128_t/uint128_t.cpp)
-endif()
+target_sources(reversi PRIVATE lib/uint128_t/uint128_t.cpp)
+
 target_link_libraries(reversi PRIVATE glfw)
 target_link_libraries(reversi PRIVATE glad)
 target_link_libraries(reversi PRIVATE glm)

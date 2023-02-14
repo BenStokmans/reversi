@@ -9,7 +9,6 @@ namespace Game {
     void Init();
     void PlayMove(const Move& move, char color);
     Move GetMove(Point point);
-    Move GetValidDirectionsForCell(Point cell, char gameBoard[8][8], char color);
     std::vector<Move> GetPossibleMoves(char color);
 }
 

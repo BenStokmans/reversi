@@ -6,6 +6,7 @@ int main() {
     logger.info("starting reversi UI");
 
     UI::Init();
+    AIEnv::Init();
     Game::Init();
 
     // shader loading has to be done in main

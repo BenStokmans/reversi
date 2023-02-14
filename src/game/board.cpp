@@ -1,23 +1,5 @@
 #include "board.h"
 
-void Game::Board::PlayMove(const Move& move, char color, char board[8][8]) {
-    for (auto direction : move.directions) {
-        int dx = direction.x, dy = direction.y;
-        int x = move.cell.x + dx, y = move.cell.y + dy;
-
-        while (x > -1 && x < boardSize && y > -1 && y < boardSize) {
-            // if we encounter an empty space this direction is automatically invalid
-            if (board[x][y] == 0) break;
-            if (board[x][y] == color) break;
-            if (board[x][y] != color) {
-                board[x][y] = color;
-            }
-            x += dx, y += dy;
-        }
-    }
-    board[move.cell.x][move.cell.y] = color;
-}
-
 std::vector<Point> Game::Board::GetSurroundingCoordinates(Point p) {
     std::vector<Point> points;
     for (int dx = -1; dx <= 1; dx++) {
@@ -73,7 +55,6 @@ Move Game::Board::GetValidDirectionsForCell(Point cell, char board[8][8], char c
 // note 1: MSVC does not have __int128 like GCC, so we have to use an external library instead.
 // note 2: right now we represent the board in 128 bits, but we should be able to theoretically represent it in
 // 64log2(3)≈102 bits.
-#ifdef WIN32
 uint128_t Game::Board::State(char board[8][8]) {
     unsigned long mask = 0;
     unsigned long value = 0;
@@ -98,49 +79,13 @@ uint128_t Game::Board::State(char board[8][8]) {
 
 // we have to initialize these like this because the compiler doesn't allow constants larger than the max value of a
 // 64-bit unsigned integer
-uint128_t a = (((uint128_t)0x1D15F8C153AB3B6BUL) << 64) | 0x6E6E63F10BD4FD48UL;
-uint128_t b = (((uint128_t)0x06B265B3CC88EF3BUL) << 64) | 0xE56FFC797D5D431DUL;
-uint128_t c = (((uint128_t)0xB8F238E50CC7CACCUL) << 64) | 0xFC27CCEEFE6D02BBUL;
+uint128_t d = (((uint128_t)0x1D15F8C153AB3B6BUL) << 64) | 0x6E6E63F10BD4FD48UL;
+uint128_t e = (((uint128_t)0x06B265B3CC88EF3BUL) << 64) | 0xE56FFC797D5D431DUL;
+uint128_t f = (((uint128_t)0xB8F238E50CC7CACCUL) << 64) | 0xFC27CCEEFE6D02BBUL;
 
 unsigned long Game::Board::Hash(char board[8][8]) {
     uint128_t state = State(board);
     auto low = (uint64_t)state;
     auto high = (uint64_t)(state >> 64);
-    return (uint64_t)((a * low + b * high + c) >> 64);
+    return (uint64_t)((d * low + e * high + f) >> 64);
 }
-#else
-unsigned __int128 Game::Board::State(char board[8][8]) {
-    unsigned long mask = 0;
-    unsigned long value = 0;
-
-    for (int i = 0; i < boardSize; i++) {
-        for (int j = 0; j < boardSize; j++) {
-            char val = board[i][j];
-            int index = i * boardSize + j;
-
-            // set mask bit if there is a disk on the square
-            mask ^= ((val == 0 ? 0 : 1) << index);
-            // set hash bit for the color of the disk
-            value ^= ((val == 1 ? 0 : 1) << index);
-        }
-    }
-    unsigned __int128 state = 0;
-    state ^= ((unsigned __int128)mask) << 64;
-    state ^= value;
-
-    return state;
-}
-
-// we have to initialize these like this because the compiler doesn't allow constants larger than the max value of a
-// 64-bit unsigned integer
-unsigned __int128 a = (((__int128)0x1D15F8C153AB3B6BUL) << 64) | 0x6E6E63F10BD4FD48UL;
-unsigned __int128 b = (((__int128)0x06B265B3CC88EF3BUL) << 64) | 0xE56FFC797D5D431DUL;
-unsigned __int128 c = (((__int128)0xB8F238E50CC7CACCUL) << 64) | 0xFC27CCEEFE6D02BBUL;
-
-unsigned long Game::Board::Hash(char board[8][8]) {
-    unsigned __int128 state = State(board);
-    auto low = (unsigned long)state;
-    auto high = (unsigned long)(state >> 64);
-    return (unsigned long)((a * low + b * high + c) >> 64);
-}
-#endif

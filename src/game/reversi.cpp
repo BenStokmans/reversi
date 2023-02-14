@@ -1,5 +1,4 @@
 #include "reversi.h"
-#include "ai.h"
 
 void Game::Init() {
     // reset game over popup

@@ -7,7 +7,7 @@ void DebugTab::Draw() {
         glfwSetWindowShouldClose(glfwWindow, true);
     }
 
-    // TODO: just keep track of these counts or compute them after every move so we dont have to do this every frame
+    // TODO: just keep track of these counts or compute them after every move so we don't have to do this every frame
     int whiteDisks = 0, blackDisks = 0;
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
