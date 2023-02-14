@@ -13,6 +13,7 @@
 #include "state.h"
 #include "ui/helper.h"
 #include "game/reversi.h"
+#include "online/client.h"
 
 int main();
 

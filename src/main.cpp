@@ -8,6 +8,7 @@ int main() {
     UI::Init();
     AIEnv::Init();
     Game::Init();
+    Client::Connect();
 
     // shader loading has to be done in main
     LOG_SHADER_NAME(gridVert, gridFrag);

@@ -1,6 +1,8 @@
 #include "fastboard.h"
 
 void AIEnv::Init() {
+    logger.info("AI", "initializing engine environment");
+
     initEdgeTable();
     initFlipPreCalc();
 }

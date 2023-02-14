@@ -5,6 +5,7 @@
 #include <cstdint>
 #include "moves.h"
 #include "../../state.h"
+#include "../../logger.h"
 
 uint_fast8_t countSetBits(uint64_t n);
 
