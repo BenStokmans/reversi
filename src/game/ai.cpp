@@ -1,20 +1,27 @@
 #include "ai.h"
 
-// maybe use a BST instead of an unordered map
-// TODO: add optimised depth caching
 std::unordered_map<uint64_t, int> maxCache;
 std::unordered_map<uint64_t, int> minCache;
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "misc-no-recursion"
-// TODO: Implement quiescence search in the future.
 int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
     if (depth == 0) {
         return board.Eval(max);
     }
-    // TODO: find out if max and min here are too strong as weight
+
+    // we have to use the flat disk count instead of the eval because it could be that weights otherwise influence the result
     if (board.GameOver()) {
-        return board.Eval(max) > 0 ? std::numeric_limits<int>::max() : std::numeric_limits<int>::min();
+        if (max) {
+            if (countSetBits(board.player) > countSetBits(board.player))
+                return std::numeric_limits<int>::max();
+            else
+                return std::numeric_limits<int>::min();
+        }
+        if (countSetBits(board.player) > countSetBits(board.player))
+            return std::numeric_limits<int>::min();
+        else
+            return std::numeric_limits<int>::max();
     }
 
     unsigned long boardHash = board.Hash();

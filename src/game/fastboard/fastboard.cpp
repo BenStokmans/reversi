@@ -6,9 +6,9 @@ void AIEnv::Init() {
 }
 
 uint_fast8_t countSetBits(uint64_t n) {
-    n = n - ((n >> 1) & 0x5555555555555555UL);
-    n = (n & 0x3333333333333333UL) + ((n >> 2) & 0x3333333333333333UL);
-    return (uint_fast8_t)(((n + (n >> 4)) & 0xF0F0F0F0F0F0F0FUL) * 0x101010101010101UL >> 56);
+    n = n - ((n >> 1) & 0x5555555555555555ULL);
+    n = (n & 0x3333333333333333ULL) + ((n >> 2) & 0x3333333333333333ULL);
+    return (uint_fast8_t)(((n + (n >> 4)) & 0xF0F0F0F0F0F0F0FULL) * 0x101010101010101ULL >> 56);
 }
 
 void FastBoard::Play(uint_fast8_t x, uint_fast8_t y) {

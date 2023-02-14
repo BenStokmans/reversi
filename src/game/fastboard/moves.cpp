@@ -12,7 +12,6 @@ uint64_t hash(uint64_t p, uint64_t o) {
 }
 
 uint64_t legalMoves(uint64_t p, uint64_t o) {
-    uint64_t edges = getEdges(p, o);
     uint64_t open = ~(p | o);
 
     uint64_t out = 0;
@@ -22,7 +21,7 @@ uint64_t legalMoves(uint64_t p, uint64_t o) {
 
             uint64_t cell = 1ULL << place;
 
-            if ((edges & cell) == 0) continue;
+            if ((edgeTable[place] & o) == 0) continue;
             bool valid = false;
 
             for (uint_fast8_t i = 0; i < 8; i++) {

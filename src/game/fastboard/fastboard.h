@@ -6,6 +6,8 @@
 #include "moves.h"
 #include "../../state.h"
 
+uint_fast8_t countSetBits(uint64_t n);
+
 namespace AIEnv {
     void Init();
 }

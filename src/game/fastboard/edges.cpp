@@ -27,17 +27,3 @@ void initEdgeTable() {
         }
     }
 }
-
-uint64_t getEdges(uint64_t p, uint64_t o) {
-    uint64_t out = 0;
-    for (uint_fast8_t y = 0; y < 8; y++) {
-        for (uint_fast8_t x = 0; x < 8; x++) {
-            uint_fast8_t place = y * 8 + x;
-            uint64_t cell = 1ULL << place;
-            if ((o & cell) == 0) continue;
-            out |= edgeTable[place];
-        }
-    }
-    out &= ~(p | o);
-    return out;
-}
