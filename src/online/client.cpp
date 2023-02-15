@@ -1,6 +1,6 @@
 #include "client.h"
 
-SOCKET sock = 0;
+int sock = 0;
 
 void Client::Connect() {
 #ifdef _WIN32

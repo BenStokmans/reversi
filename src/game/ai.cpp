@@ -12,16 +12,7 @@ int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
 
     // we have to use the flat disk count instead of the eval because it could be that weights otherwise influence the result
     if (board.GameOver()) {
-        if (max) {
-            if (countSetBits(board.player) > countSetBits(board.player))
-                return std::numeric_limits<int>::max();
-            else
-                return std::numeric_limits<int>::min();
-        }
-        if (countSetBits(board.player) > countSetBits(board.player))
-            return std::numeric_limits<int>::min();
-        else
-            return std::numeric_limits<int>::max();
+        return board.Eval(max) ? std::numeric_limits<int>::max() : std::numeric_limits<int>::min();
     }
 
     unsigned long boardHash = board.Hash();
