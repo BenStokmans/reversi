@@ -72,11 +72,6 @@ void receiveLoop() {
 }
 
 void Client::Connect() {
-#ifdef _WIN32
-    WSADATA wsa_data;
-    WSAStartup(MAKEWORD(1,1), &wsa_data);
-#endif
-
     struct sockaddr_in serv_addr{};
     char buffer[1024] = { 0 };
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -106,16 +101,6 @@ void Client::Disconnect() {
     int status = 0;
     logger.info("NETWORK", "disconnecting client");
 
-#ifdef _WIN32
-    status = shutdown(sock, SD_BOTH);
-    if (status == 0) status = closesocket(sock);
-#else
     status = shutdown(sock, SHUT_RDWR);
     if (status == 0) status = close(sock);
-#endif
-    // TODO: handle status
-
-#ifdef _WIN32
-    WSACleanup();
-#endif
 }
