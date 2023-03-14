@@ -3,10 +3,22 @@
 // inverse direction is 7 - index
 uint64_t flipPreCalc[64][8][7];
 
+uint64_t getLinesFromPoint(uint_fast8_t x, uint_fast8_t y) {
+    uint_fast8_t place = y*8+x;
+    uint64_t out = 0;
+    for (uint_fast8_t i = 0; i < 8; i++) {
+        for (uint_fast8_t j = 0; j < 7; j++) {
+            if (flipPreCalc[place][i][j] == 0) break;
+            out |= flipPreCalc[place][i][j];
+        }
+    }
+    return out;
+}
+
 void initPreCalcPart(uint_fast8_t x, uint_fast8_t y) {
     uint_fast8_t place = y*8+x;
     uint_fast8_t di = 0;
-    // allocate memory here and copy it to the cache every time instead of allocating new memory every time
+
     uint64_t line;
     uint_fast8_t li;
     for (int dy = -1; dy <= 1; dy++) {

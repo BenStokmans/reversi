@@ -3,20 +3,16 @@
 
 #include <random>
 #include "reversi.h"
-#include "board.h"
 #include "fastboard/fastboard.h"
-
-class SimulationContext {
-public:
-    SimulationContext(char startColor, char board[8][8]);
-    char playerColor{};
-    char colorToPlay{};
-    char simBoard[8][8]{};
-};
 
 namespace Game::AI {
     Move GetBestMove();
     void PlayBestMove();
+
+    int GetEval(int depth);
+    int GetEndGame(int depth);
 }
+int minmax(FastBoard board, int alpha, int beta, int depth, bool max);
+Move getMoveMinMax(FastBoard gameState, int depth);
 
 #endif //REVERSI_AI_H

@@ -1,5 +1,30 @@
 #include "helper.h"
 
+
+GLuint createEvalVertexArray(Shader* shader) {
+    const float evalVertices[12] = {
+            -1.0,  1.0, 0.0,    // top left
+            -1.0, -1.0, 0.0,    // bottom left
+            -0.9, -1.0, 0.0,     // bottom right
+            -0.9,  1.0, 0.0,   // top right
+    };
+
+    GLuint evalVertexBuffer;
+    glGenBuffers(1, &evalVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, evalVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(evalVertices), evalVertices, GL_STATIC_DRAW);
+
+    GLuint evalVertexArray;
+    glGenVertexArrays(1, &evalVertexArray);
+    glBindVertexArray(evalVertexArray);
+
+    GLint positionIndex = shader->getAttributeLocation("aPosition");
+    glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)nullptr);
+    glEnableVertexAttribArray(positionIndex);
+
+    return evalVertexArray;
+}
+
 GLuint createGridVertexArray(Shader* shader) {
     const float gridVertices[12] = {
             -1.0,  1.0, 0.0,    // top left

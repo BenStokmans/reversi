@@ -43,10 +43,12 @@ void UI::DrawUI() {
 }
 
 void UI::DrawGame(
+        Shader* evalShader, GLuint evalVAO,
         Shader* gridShader, GLuint gridVAO,
         Shader* cellShader, GLuint cellVAO,
         Shader* diskShader, GLuint diskVAO
     ) {
+
     cellShader->use();
     glBindVertexArray(cellVAO);
     // render highlighting
@@ -65,6 +67,12 @@ void UI::DrawGame(
     diskShader->use();
     glBindVertexArray(diskVAO);
     drawDisks(diskShader);
+
+    evalShader->use();
+    evalShader->set("divider", evalBarValue);
+    evalShader->set("opacity", 0.3f);
+    glBindVertexArray(evalVAO);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
 

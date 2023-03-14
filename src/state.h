@@ -3,7 +3,9 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "game/fastboard/fastboard.h"
 #include <vector>
+#include <unordered_map>
 
 #define DEBUG
 
@@ -25,7 +27,6 @@ struct Point {
 
 struct Move {
     Point cell;
-    std::vector<Point> directions;
     int gain{};
     unsigned long boardHash{};
 
@@ -65,6 +66,19 @@ extern const char* aiColorStr;
 extern char aiColor;
 extern int aiDepth;
 
+// eval settings
+extern bool showEval;
+extern int quiescenceSearchLim;
+extern bool quiescenceSearchEnabled;
+extern std::string currentEvalText;
+extern std::unordered_map<uint64_t, Move> bestMoveNow;
+extern std::unordered_map<uint64_t, Move> bestMoveNext;
+// eval bar animation
+extern bool enableEvalBar;
+extern float evalBarAnimationRate;
+extern float evalBarValueGoal;
+extern float evalBarValue;
+
 // window settings
 extern bool showDebugWindow;
 extern bool showGameWindow;
@@ -98,10 +112,11 @@ extern bool highlightModifiedCells;
 extern Color4 highlightAiColor;
 extern bool highlightAiMove;
 
-extern std::vector<Point> modifiedCells;
+extern uint64_t modifiedCells;
 extern std::vector<Move> currentLegalMoves;
 extern bool highlighted[8][8];
-extern char gameBoard[8][8];
+extern FastBoard gameBoard;
+
 
 extern GLFWwindow* glfwWindow;
 

@@ -10,7 +10,12 @@ int main() {
     Game::Init();
     Client::Connect();
 
+
     // shader loading has to be done in main
+    LOG_SHADER_NAME(evalVert, evalFrag);
+    Shader evalShader = Shader(evalVert, evalFrag);
+    GLuint evalVertexArray = createEvalVertexArray(&evalShader);
+
     LOG_SHADER_NAME(gridVert, gridFrag);
     Shader gridShader = Shader(gridVert, gridFrag);
     GLuint gridVertexArray = createGridVertexArray(&gridShader);
@@ -41,6 +46,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         UI::DrawGame(
+                &evalShader, evalVertexArray,
                 &gridShader, gridVertexArray,
                 &cellShader, cellVertexArray,
                 &diskShader, diskVertexArray

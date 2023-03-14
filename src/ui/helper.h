@@ -4,6 +4,7 @@
 #include "shader.h"
 #include "../state.h"
 
+GLuint createEvalVertexArray(Shader* shader);
 GLuint createGridVertexArray(Shader* shader);
 GLuint createDiskVertexArray(Shader* shader);
 GLuint createCellVertexArray(Shader* shader);

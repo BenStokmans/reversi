@@ -26,5 +26,15 @@ void LocalTab::Draw() {
         }
         ImGui::EndCombo();
     }
+    ImGui::Separator();
+    ImGui::Checkbox("Show Eval", &showEval);
+    if (showEval) {
+        ImGui::Text("%s", currentEvalText.c_str());
+    }
+    if (ImGui::Checkbox("Show eval bar", &enableEvalBar)) {
+        if (enableEvalBar) {
+            Game::AI::StartEvalBarAnimation();
+        }
+    }
     ImGui::EndTabItem();
 }

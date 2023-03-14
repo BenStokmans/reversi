@@ -1,4 +1,5 @@
 #include "state.h"
+#include "game/fastboard/fastboard.h"
 
 bool showAiMove = false;
 Move cachedAiMove = {};
@@ -13,7 +14,18 @@ const char* aiDifficultyStr = "Random";
 AiDifficulty aiDifficulty = AiDifficulty::Random;
 const char* aiColorStr = "White";
 char aiColor = 2; // white
-int aiDepth = 1;
+int aiDepth = 10;
+
+bool showEval = true;
+int quiescenceSearchLim = 25;
+bool quiescenceSearchEnabled = true;
+std::string currentEvalText = "Eval: uninitialized";
+std::unordered_map<uint64_t, Move> bestMoveNow = std::unordered_map<uint64_t, Move>();
+std::unordered_map<uint64_t, Move> bestMoveNext = std::unordered_map<uint64_t, Move>();
+bool enableEvalBar = true;
+float evalBarValueGoal = 0.f;
+float evalBarAnimationRate = 0.01f;
+float evalBarValue = 0.f;
 
 bool showGameWindow = true;
 bool showWinWindow = true;
@@ -40,9 +52,9 @@ bool highlightModifiedCells = true;
 Color4 highlightAiColor = {50, 80, 150, 255};
 bool highlightAiMove = false;
 
-std::vector<Point> modifiedCells;
+uint64_t modifiedCells;
 std::vector<Move> currentLegalMoves;
 bool highlighted[8][8] = {};
-char gameBoard[8][8] = {};
+FastBoard gameBoard;
 
 GLFWwindow* glfwWindow = nullptr;

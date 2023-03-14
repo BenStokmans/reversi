@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "../../game/reversi.h"
 #include "../../game/ai.h"
+#include "../../game/search.h"
 
 namespace LocalTab {
     void Draw();

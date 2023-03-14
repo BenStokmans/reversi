@@ -10,10 +10,10 @@ void drawDisks(Shader* shader) {
     // draw all disks on the board and the hovered cell if it's our turn
     for (int i = 0; i < boardSize; i++) {
         for (int j = 0; j < boardSize; j++) {
-            char side = gameBoard[i][j];
+            char side = gameBoard.GetIsCurrentPlayer(i, j) ? CURRENT_PLAYER : NEXT_PLAYER;
 
             bool renderHover = i == hoverCell.x && j == hoverCell.y && clientTurn;
-            if (side == 0 && !renderHover) continue;
+            if (gameBoard.CellIsOpen(i, j) && !renderHover) continue;
 
             float x = (-1 + diskSize) + (float)i * diskSize * 2;
             float y = (-1 + diskSize) + (float)j * diskSize * 2;
@@ -23,7 +23,7 @@ void drawDisks(Shader* shader) {
                 color = glm::vec4(1);
             }
 
-            if (renderHover && side == 0) {
+            if (renderHover && gameBoard.CellIsOpen(i, j) ) {
                 color = glm::vec4(glm::vec3(clientIsWhite ? 1 : 0), 0.3);
             }
             shader->set("centre", glm::vec2(x,y));
@@ -36,14 +36,19 @@ void drawDisks(Shader* shader) {
 void highlightPossibleMoves(Shader* shader) {
     if (!highlightPossibleCells || !clientTurn) return;
     float cellSize = 1.0f / (float)boardSize;
-
     shader->set("color", highlightPossibleColor);
-    auto possibleMoves = Game::GetPossibleMoves(LOCAL_PLAYER);
-    for (const auto& move : possibleMoves) {
-        float x = (-1 + cellSize) + (float)move.cell.x * cellSize * 2;
-        float y = (-1 + cellSize) + (float)move.cell.y * cellSize * 2;
-        shader->set("centre", glm::vec2(x,y));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    auto possibleMoves = gameBoard.Moves();
+    for (int i = 0; i < boardSize; i++) {
+        for (int j = 0; j < boardSize; j++) {
+            uint_fast8_t place = j*8+i;
+            if ((possibleMoves & 1ULL << place) == 0) continue;
+
+            float x = (-1 + cellSize) + (float)i * cellSize * 2;
+            float y = (-1 + cellSize) + (float)j * cellSize * 2;
+            shader->set("centre", glm::vec2(x,y));
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        }
     }
 }
 
@@ -52,11 +57,16 @@ void highLightModified(Shader* shader) {
     float cellSize = 1.0f / (float)boardSize;
 
     shader->set("color", highlightModifiedColor);
-    for (const auto& cell : modifiedCells) {
-        float x = (-1 + cellSize) + (float)cell.x * cellSize * 2;
-        float y = (-1 + cellSize) + (float)cell.y * cellSize * 2;
-        shader->set("centre", glm::vec2(x,y));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    for (int i = 0; i < boardSize; i++) {
+        for (int j = 0; j < boardSize; j++) {
+            uint_fast8_t place = j*8+i;
+            if ((modifiedCells & 1ULL << place) == 0) continue;
+
+            float x = (-1 + cellSize) + (float)i * cellSize * 2;
+            float y = (-1 + cellSize) + (float)j * cellSize * 2;
+            shader->set("centre", glm::vec2(x,y));
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        }
     }
 }
 
@@ -67,13 +77,11 @@ void drawGameOver() {
     }
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing);
 
-    int whiteDisks = 0, blackDisks = 0;
-    for (int i = 0; i < boardSize; i++) {
-        for (int j = 0; j < boardSize; j++) {
-            char side = gameBoard[i][j];
-            if (side == 1) blackDisks++;
-            if (side == 2) whiteDisks++;
-        }
+    int whiteDisks = gameBoard.PlayerDisks(), blackDisks = gameBoard.OpponentDisks();
+    if (CURRENT_PLAYER == 1) {
+        int tmp = whiteDisks;
+        whiteDisks = blackDisks;
+        blackDisks = tmp;
     }
     ImGui::Begin("Game over", &showWinWindow);
     ImGui::Text("%s has won the game!", whiteDisks > blackDisks ? "white" : "black");
@@ -83,7 +91,7 @@ void drawGameOver() {
 void showBestMove(Shader* cellShader, GLuint cellVAO, Shader* diskShader, GLuint diskVAO) {
     aiColor = CURRENT_PLAYER;
     Move move = cachedAiMove;
-    if (move.boardHash != Game::Board::Hash(gameBoard)) {
+    if (move.boardHash != gameBoard.Hash()) {
         move = Game::AI::GetBestMove();
         cachedAiMove = move;
     }

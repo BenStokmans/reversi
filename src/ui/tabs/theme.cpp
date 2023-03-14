@@ -5,6 +5,7 @@ void ThemeTab::Draw() {
         return;
 
     ImGui::Dummy(ImVec2(4,4));
+
     // TODO: shorten name
     float highlightPossibleColorBuffer[4] = {
             (float)highlightPossibleColor.r / 255.f,
