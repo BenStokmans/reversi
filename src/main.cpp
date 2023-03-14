@@ -1,6 +1,8 @@
 #include "main.h"
 
 int main() {
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
+
     // initialize Logger
     logger.create("TRACE");
     logger.info("starting reversi UI");

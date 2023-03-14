@@ -2,6 +2,75 @@
 
 int sock = 0;
 
+void heartbeatLoop() {
+    while (sock != 0) {
+        reversi::Heartbeat heartbeat{};
+        sendMsg(heartbeat);
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+}
+
+void handleConnected(const google::protobuf::Any& any)  {
+    reversi::Connected msg;
+
+    if(!any.UnpackTo(&msg)) return;
+    logger.info("NETWORK", "playerId: " + std::to_string(msg.player_id()));
+
+    std::thread t(heartbeatLoop);
+    t.detach();
+}
+
+void handleAnyMessage(const google::protobuf::Any& any) {
+    const std::string& type = any.type_url();
+    if (type == "type.googleapis.com/reversi.Connected") return handleConnected(any);
+}
+
+void sendMsg(const google::protobuf::Message& message) {
+    google::protobuf::Any any;
+    if (!any.PackFrom(message)) {
+        logger.error("NETWORK", "could not pack message");
+        return;
+    }
+
+
+    size_t s = any.ByteSizeLong();
+    char buffer[s];
+    if (!any.SerializeToArray(buffer, s)) {
+        logger.error("NETWORK", "could not serialize message");
+        return;
+    }
+    send(sock, buffer, s, 0);
+}
+
+void receiveLoop() {
+    char buffer[1024];
+    while (sock != 0) {
+        int error_code;
+        socklen_t error_code_size = sizeof(error_code);
+        getsockopt(sock, SOL_SOCKET, SO_ERROR, &error_code, &error_code_size);
+        if (error_code != 0) {
+            logger.error("NETWORK", strerror(error_code));
+        }
+        bzero(buffer, 1024);
+        ssize_t n = read(sock, buffer, 1024);
+        if (n < 0) continue;
+
+        google::protobuf::Any any;
+        any.ParseFromArray(buffer, n);
+
+        if (any.ParseFromArray(buffer,n)) {
+            if (any.type_url().empty()) {
+                continue;
+            }
+            handleAnyMessage(any);
+        }
+    }
+    close(sock);
+    logger.info("NETWORK", "disconnected from server");
+    sock = 0;
+}
+
 void Client::Connect() {
 #ifdef _WIN32
     WSADATA wsa_data;
@@ -29,7 +98,8 @@ void Client::Connect() {
     }
     logger.info("NETWORK", "client successfully connected");
 
-    // send(sock, buf, sizeof(buf), 0);
+    std::thread t(receiveLoop);
+    t.detach();
 }
 
 void Client::Disconnect() {

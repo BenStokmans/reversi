@@ -6,14 +6,15 @@
 #include <Windows.h>
 #endif
 
-#include "logger.h"
+#include <google/protobuf/stubs/common.h>
+#include "online/client.h"
+
 #include "ui/shader.h"
 #include "ui/shaders.h"
 #include "ui/ui.h"
 #include "state.h"
 #include "ui/helper.h"
 #include "game/reversi.h"
-#include "online/client.h"
 
 int main();
 

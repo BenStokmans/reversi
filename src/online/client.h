@@ -11,8 +11,14 @@
 #include <unistd.h>
 #endif
 
+#include <thread>
 #include "../logger.h"
+#include "reversi.pb.h"
+#include <google/protobuf/any.pb.h>
+
 #define PORT 8080
+
+void sendMsg(const google::protobuf::Message& message);
 
 namespace Client {
     void Connect();
