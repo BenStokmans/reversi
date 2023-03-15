@@ -30,7 +30,6 @@ double evalBarValue = 0.f;
 bool showGameWindow = true;
 bool showWinWindow = true;
 bool winWindowFocus = true;
-bool gameOver = true;
 
 int windowStartX = 100, windowStartY = 100;
 

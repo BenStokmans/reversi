@@ -84,7 +84,6 @@ extern bool showDebugWindow;
 extern bool showGameWindow;
 extern bool showWinWindow;
 extern bool winWindowFocus;
-extern bool gameOver;
 
 extern int windowStartX, windowStartY;
 

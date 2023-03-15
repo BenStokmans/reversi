@@ -14,7 +14,7 @@ void UI::DrawUI() {
         glfwSetWindowShouldClose(glfwWindow, true);
     }
     ImGui::BeginTabBar("Reversi#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
-    if (gameOver) {
+    if (gameBoard.GameOver()) {
         drawGameOver();
     }
 
@@ -55,7 +55,7 @@ void UI::DrawGame(
     highlightPossibleMoves(cellShader);
     highLightModified(cellShader);
 
-    if (showAiMove && !gameOver && gameMode == GameMode::Local)
+    if (showAiMove && gameBoard.GameOver() && gameMode == GameMode::Local)
         showBestMove(cellShader, cellVAO, diskShader, diskVAO);
 
     // draw grid on top of the highlighted cells

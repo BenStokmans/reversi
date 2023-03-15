@@ -11,6 +11,10 @@ int_fast8_t minmax(FastBoard board, int_fast8_t alpha, int_fast8_t beta, int dep
     if (depth == 0 || board.GameOver()) {
         return board.Eval(max);
     }
+    if (board.Moves() == 0) {
+        board.SwitchTurn();
+        max = !max;
+    }
 
     unsigned long boardHash = board.Hash();
     if (max) {
@@ -263,13 +267,17 @@ int_fast8_t Game::AI::GetEval(int depth) {
 }
 
 int_fast8_t Game::AI::GetEndGame(int depth) {
-    return gameEndMinMax(gameBoard, depth, false);
+    return gameEndMinMax(gameBoard, depth, true);
 }
 
 void Game::AI::PlayBestMove() {
     modifiedCells = 0;
     Move m = Game::AI::GetBestMove();
     modifiedCells = gameBoard.Play(m.cell.x, m.cell.y);
-    clientTurn = true;
-    gameOver = gameBoard.Moves() == 0;
+    while (gameBoard.Moves() == 0 && !gameBoard.GameOver()) {
+        m = Game::AI::GetBestMove();
+        modifiedCells |= gameBoard.Play(m.cell.x, m.cell.y);
+        clientTurn = !clientTurn;
+    }
+    clientTurn = !clientTurn;
 }

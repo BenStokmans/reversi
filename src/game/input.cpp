@@ -43,9 +43,12 @@ void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, 
         thr.detach();
     }
 
-    gameOver = gameBoard.Moves() == 0;
     if (gameMode == GameMode::Local) {
         clientTurn = true;
+        if (gameBoard.Moves() == 0) {
+            gameBoard.SwitchTurn();
+            return;
+        }
         clientIsWhite = !clientIsWhite;
     }
 }

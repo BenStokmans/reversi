@@ -30,7 +30,7 @@ public:
         return ::hash(player, opponent);
     }
     [[nodiscard]] bool GameOver() const {
-        return Moves() == 0;
+        return legalMoves(player, opponent) == 0 && legalMoves(opponent, player) == 0;
     }
     bool CellIsOpen(uint_fast8_t x, uint_fast8_t y);
     FastBoard Clone() {

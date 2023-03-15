@@ -31,10 +31,6 @@ uint64_t legalMoves(const uint64_t player, const uint64_t opponent) {
     return moves & ~(player | opponent);
 }
 
-uint64_t calcFlip(uint64_t p, uint64_t o, uint_fast8_t x, uint_fast8_t y) {
-    return calcFlip(p, o, y*8+x);
-}
-
 uint64_t calcFlip(uint64_t p, uint64_t o, uint_fast8_t place) {
     uint64_t open = ~(p | o);
 

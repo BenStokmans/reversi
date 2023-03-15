@@ -78,10 +78,10 @@ void searchLoop() {
 
         if (eval == 100 || eval == -100) {
             int_fast8_t d = depth - Game::AI::GetEndGame(depth);
-            const char* color = eval == 100 ? "black" : "white";
+            const char* color = eval == 100 ? "black" : "white" ;
             if (d == 0) {
                 text = string_format("Eval: %s has won", color, d, depth);
-            } else {
+            } else if (d > 0 && d < 100) {
                 text = string_format("Eval: %s wins in %d moves (depth: %d)", color, d, depth);
             }
         } else {

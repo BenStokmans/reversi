@@ -2,7 +2,6 @@
 
 void Game::Init() {
     // reset game over popup
-    gameOver = false;
     gameStarted = false;
     winWindowFocus = true;
 

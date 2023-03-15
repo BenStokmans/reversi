@@ -17,7 +17,7 @@ void DebugTab::Draw() {
     ImGui::Text("Turn: %s", CURRENT_PLAYER == 2 ? "white" : "black");
     ImGui::Text("White disks: %d", whiteDisks);
     ImGui::Text("Black disks: %d", blackDisks);
-    ImGui::Text("Game over: %s", gameOver ? "true" : "false");
+    ImGui::Text("Game over: %s", gameBoard.GameOver() ? "true" : "false");
 
     ImGui::Separator();
     if (ImGui::Checkbox("Enable Quiescence Search", &quiescenceSearchEnabled)) {
@@ -25,7 +25,7 @@ void DebugTab::Draw() {
             Game::AI::StartSearch();
         }
     }
-    ImGui::SliderInt("Quiescence Search Max", &quiescenceSearchLim, 1, 64, "%d", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::SliderInt("Quiescence Search Max", &quiescenceSearchLim, 1, 30, "%d", ImGuiSliderFlags_AlwaysClamp);
 
     ImGui::EndTabItem();
 }

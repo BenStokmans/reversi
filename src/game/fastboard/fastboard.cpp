@@ -18,20 +18,16 @@ uint_fast8_t countSetBits(uint64_t n) {
     return (uint_fast8_t)(((n + (n >> 4)) & 0xF0F0F0F0F0F0F0FULL) * 0x101010101010101ULL >> 56);
 }
 
-uint64_t FastBoard::Play(uint_fast8_t x, uint_fast8_t y) {
-    uint64_t flip = calcFlip(this->player, this->opponent, x, y);
-    this->player |= flip;
-    this->opponent &= ~flip;
-    this->SwitchTurn();
-    return flip;
-}
-
 uint64_t FastBoard::Play(uint_fast8_t place) {
     uint64_t flip = calcFlip(this->player, this->opponent, place);
     this->player |= flip;
     this->opponent &= ~flip;
     this->SwitchTurn();
     return flip;
+}
+
+uint64_t FastBoard::Play(uint_fast8_t x, uint_fast8_t y) {
+    return this->Play(y*8+x);
 }
 
 int_fast8_t evalTable[8][8] = {
