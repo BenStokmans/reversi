@@ -25,7 +25,7 @@ void DebugTab::Draw() {
             Game::AI::StartSearch();
         }
     }
-    ImGui::SliderInt("Quiescence Search Max", &quiescenceSearchLim, 1, 50, "%d", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::SliderInt("Quiescence Search Max", &quiescenceSearchLim, 1, 64, "%d", ImGuiSliderFlags_AlwaysClamp);
 
     ImGui::EndTabItem();
 }

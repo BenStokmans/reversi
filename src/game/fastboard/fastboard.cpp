@@ -142,11 +142,11 @@ int_fast8_t dynHeuristicEval(FastBoard board)  {
     else moveH = 0;
 
     // final weighted score
-    // 10 + 801.724 + 382.026 + 78.922 + 74.396 + 10 = 1357.068
     // 0.01 + 0.59 + 0.29 + 0.05 + 0.05 + 0.01 = 1
     // 1 + 59 + 29 + 5 + 5 + 1 = 100
-    // double score = (10 * diskH) + (801.724 * cornerH) + (382.026 * cornerCloseH) + (78.922 * moveH) + (74.396 * edgeDiskH) + (10 * cellH);
-    double score = (1 * diskH) + (59 * cornerH) + (29 * cornerCloseH) + (5 * moveH) + (5 * edgeDiskH) + (1 * cellH);
+
+    // 0.15 + 0.25 + 0.25 + 0.1 + 0.1 + 0.15 = 1
+    double score = (15 * diskH) + (25 * cornerH) + (25 * cornerCloseH) + (10 * moveH) + (10 * edgeDiskH) + (15 * cellH);
     auto s = (int_fast8_t)(score / 100);
     return s;
 }
