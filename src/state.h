@@ -75,9 +75,9 @@ extern std::unordered_map<uint64_t, Move> bestMoveNow;
 extern std::unordered_map<uint64_t, Move> bestMoveNext;
 // eval bar animation
 extern bool enableEvalBar;
-extern float evalBarAnimationRate;
-extern float evalBarValueGoal;
-extern float evalBarValue;
+extern double evalBarAnimationRate;
+extern double evalBarValueGoal;
+extern double evalBarValue;
 
 // window settings
 extern bool showDebugWindow;

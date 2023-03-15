@@ -69,7 +69,7 @@ void UI::DrawGame(
     drawDisks(diskShader);
 
     evalShader->use();
-    evalShader->set("divider", evalBarValue);
+    evalShader->set("divider", (float)evalBarValue);
     evalShader->set("opacity", 0.3f);
     glBindVertexArray(evalVAO);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

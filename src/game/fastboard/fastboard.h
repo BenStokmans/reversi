@@ -22,7 +22,7 @@ public:
         player = 0x0000001008000000ULL;
         opponent = 0x0000000810000000ULL;
     }
-    [[nodiscard]] int Eval(bool max) const;
+    [[nodiscard]] int_fast8_t Eval(bool maxPlayer) const;
     [[nodiscard]] uint64_t Moves() const {
         return legalMoves(player, opponent);
     }
@@ -37,6 +37,7 @@ public:
         return FastBoard{player, opponent};
     }
     [[nodiscard]] bool GetIsCurrentPlayer(uint_fast8_t x, uint_fast8_t y) const;
+    [[nodiscard]] bool GetIsOpponentPlayer(uint_fast8_t x, uint_fast8_t y) const;
     void SwitchTurn() {
         std::swap(player, opponent);
     }

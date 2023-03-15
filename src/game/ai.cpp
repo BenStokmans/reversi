@@ -1,20 +1,15 @@
 #include "ai.h"
 
-std::unordered_map<uint64_t, int> maxCache;
+std::unordered_map<uint64_t, int_fast8_t> maxCache;
 std::mutex maxMutex;
-std::unordered_map<uint64_t, int> minCache;
+std::unordered_map<uint64_t, int_fast8_t> minCache;
 std::mutex minMutex;
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "misc-no-recursion"
-int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
-    if (depth == 0) {
+int_fast8_t minmax(FastBoard board, int_fast8_t alpha, int_fast8_t beta, int depth, bool max) {
+    if (depth == 0 || board.GameOver()) {
         return board.Eval(max);
-    }
-
-    // we have to use the flat disk count instead of the eval because it could be that weights otherwise influence the result
-    if (board.GameOver()) {
-        return board.Eval(max) ? std::numeric_limits<int>::max() : std::numeric_limits<int>::min();
     }
 
     unsigned long boardHash = board.Hash();
@@ -24,7 +19,7 @@ int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
             return cachedMax->second;
         }
 
-        int maxEval = std::numeric_limits<int>::min();
+        int_fast8_t maxEval = std::numeric_limits<int_fast8_t>::min();
         uint64_t moves = board.Moves();
         for (uint_fast8_t y = 0; y < 8; y++) {
             bool b = false;
@@ -35,7 +30,7 @@ int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
 
                 FastBoard local = board.Clone();
                 local.Play(place);
-                int eval = minmax(local, alpha, beta, depth - 1, false);
+                int_fast8_t eval = minmax(local, alpha, beta, depth - 1, false);
                 if (eval > maxEval)
                     maxEval = eval;
                 if (eval > alpha)
@@ -58,7 +53,7 @@ int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
         return cachedMin->second;
     }
 
-    int minEval = std::numeric_limits<int>::max();
+    int_fast8_t minEval = std::numeric_limits<int_fast8_t>::max();
     uint64_t moves = board.Moves();
     for (uint_fast8_t y = 0; y < 8; y++) {
         bool b = false;
@@ -69,7 +64,7 @@ int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
 
             FastBoard local = board.Clone();
             local.Play(place);
-            int eval = minmax(local, alpha, beta, depth - 1, true);
+            int_fast8_t eval = minmax(local, alpha, beta, depth - 1, true);
             if (eval < minEval)
                 minEval = eval;
             if (eval < beta)
@@ -87,7 +82,7 @@ int minmax(FastBoard board, int alpha, int beta, int depth, bool max) {
     return minEval;
 }
 
-int gameEndMinMax(FastBoard board, int depth, bool max) {
+int_fast8_t gameEndMinMax(FastBoard board, int depth, bool max) {
     if (board.GameOver()) {
         return depth;
     }
@@ -97,7 +92,7 @@ int gameEndMinMax(FastBoard board, int depth, bool max) {
     }
 
     if (max) {
-        int maxEval = std::numeric_limits<int>::min();
+        int_fast8_t maxEval = std::numeric_limits<int_fast8_t>::min();
         uint64_t moves = board.Moves();
         for (uint_fast8_t y = 0; y < 8; y++) {
             for (uint_fast8_t x = 0; x < 8; x++) {
@@ -107,7 +102,7 @@ int gameEndMinMax(FastBoard board, int depth, bool max) {
 
                 FastBoard local = board.Clone();
                 local.Play(place);
-                int eval = gameEndMinMax(local, depth - 1, false);
+                int_fast8_t eval = gameEndMinMax(local, depth - 1, false);
                 if (eval > maxEval)
                     maxEval = eval;
             }
@@ -115,7 +110,7 @@ int gameEndMinMax(FastBoard board, int depth, bool max) {
         return maxEval;
     }
 
-    int minEval = std::numeric_limits<int>::max();
+    int_fast8_t minEval = std::numeric_limits<int_fast8_t>::max();
     uint64_t moves = board.Moves();
     for (uint_fast8_t y = 0; y < 8; y++) {
         for (uint_fast8_t x = 0; x < 8; x++) {
@@ -125,7 +120,7 @@ int gameEndMinMax(FastBoard board, int depth, bool max) {
 
             FastBoard local = board.Clone();
             local.Play(place);
-            int eval = gameEndMinMax(local, depth - 1, true);
+            int_fast8_t eval = gameEndMinMax(local, depth - 1, true);
             if (eval < minEval)
                 minEval = eval;
         }
@@ -137,9 +132,9 @@ int gameEndMinMax(FastBoard board, int depth, bool max) {
 #pragma clang diagnostic pop
 
 Move getMoveMinMax(FastBoard gameState, int depth) {
-    int maxEval = std::numeric_limits<int>::min();
-    int alpha = std::numeric_limits<int>::min();
-    int beta = std::numeric_limits<int>::max();
+    int_fast8_t maxEval = std::numeric_limits<int_fast8_t>::min();
+    int_fast8_t alpha = std::numeric_limits<int_fast8_t>::min();
+    int_fast8_t beta = std::numeric_limits<int_fast8_t>::max();
 
     Point bestCell{};
     FastBoard board = gameState.Clone();
@@ -156,7 +151,7 @@ Move getMoveMinMax(FastBoard gameState, int depth) {
             FastBoard local = board.Clone();
             local.Play(place);
 
-            int eval = minmax(local, alpha, beta, depth - 1, false);
+            int_fast8_t eval = minmax(local, alpha, beta, depth - 1, false);
             if (eval > maxEval) {
                 maxEval = eval;
                 bestCell = {x, y};
@@ -260,14 +255,14 @@ Move Game::AI::GetBestMove() {
     return {};
 }
 
-int Game::AI::GetEval(int depth) {
-    int alpha = std::numeric_limits<int>::min();
-    int beta = std::numeric_limits<int>::max();
+int_fast8_t Game::AI::GetEval(int depth) {
+    int_fast8_t alpha = std::numeric_limits<int_fast8_t>::min();
+    int_fast8_t beta = std::numeric_limits<int_fast8_t>::max();
 
     return minmax(gameBoard, alpha, beta, depth, CURRENT_PLAYER == 1);
 }
 
-int Game::AI::GetEndGame(int depth) {
+int_fast8_t Game::AI::GetEndGame(int depth) {
     return gameEndMinMax(gameBoard, depth, false);
 }
 

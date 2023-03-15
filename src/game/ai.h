@@ -9,10 +9,10 @@ namespace Game::AI {
     Move GetBestMove();
     void PlayBestMove();
 
-    int GetEval(int depth);
-    int GetEndGame(int depth);
+    int_fast8_t GetEval(int depth);
+    int_fast8_t GetEndGame(int depth);
 }
-int minmax(FastBoard board, int alpha, int beta, int depth, bool max);
+int_fast8_t minmax(FastBoard board, int_fast8_t alpha, int_fast8_t beta, int depth, bool max);
 Move getMoveMinMax(FastBoard gameState, int depth);
 
 #endif //REVERSI_AI_H

@@ -13,7 +13,7 @@ std::string string_format(const std::string& format, Args... args)
     return {buf.get(), buf.get() + size - 1}; // We don't want the '\0' inside
 }
 
-void calcBestForNext(int depth, bool* cancel, int* e) {
+void calcBestForNext(int depth, bool* cancel, int_fast8_t* e) {
     bestMoveNext.clear();
 
     auto moves = gameBoard.Moves();
@@ -34,14 +34,14 @@ void calcBestForNext(int depth, bool* cancel, int* e) {
         }
     }
     *cancel = true;
-    int alpha = std::numeric_limits<int>::min();
-    int beta = std::numeric_limits<int>::max();
+    int_fast8_t alpha = std::numeric_limits<int_fast8_t>::min();
+    int_fast8_t beta = std::numeric_limits<int_fast8_t>::max();
 
     *e = minmax(gameBoard, alpha, beta, depth, true);
 }
 
 void searchLoop() {
-    int depth = 2;
+    int_fast8_t depth = 2;
     auto lastHash = gameBoard.Hash();
     while (quiescenceSearchEnabled) {
         if (lastHash != gameBoard.Hash()) {
@@ -58,7 +58,7 @@ void searchLoop() {
 
         std::string text;
         bool cancel = false;
-        int eval = 0;
+        int_fast8_t eval = 0;
 
         std::thread t(calcBestForNext, depth, &cancel, &eval);
         t.detach();
@@ -75,27 +75,19 @@ void searchLoop() {
         if (!quiescenceSearchEnabled) {
             break; // we have this here to make sure the thread is stopped even if the eval calculation takes very long
         }
-        uint64_t covered = gameBoard.player | gameBoard.opponent;
-        int maxEval =
-                countSetBits(covered) * aiDiskMul +
-                countSetBits(covered & 0x3C0081818181003CULL) * aiEdgeDiskMul +
-                countSetBits(covered & 0x8100000000000081ULL) * aiCornerDiskMul -
-                countSetBits(covered & 0x4281000000008142ULL) * aiAdjacentCornerDiskMul;
 
-        if (eval == std::numeric_limits<int>::max() || eval == std::numeric_limits<int>::min()) {
-            int d = depth - Game::AI::GetEndGame(depth);
-            const char* color = eval == std::numeric_limits<int>::max() ? "white" : "black";
+        if (eval == 100 || eval == -100) {
+            int_fast8_t d = depth - Game::AI::GetEndGame(depth);
+            const char* color = eval == 100 ? "black" : "white";
             if (d == 0) {
                 text = string_format("Eval: %s has won", color, d, depth);
             } else {
                 text = string_format("Eval: %s wins in %d moves (depth: %d)", color, d, depth);
             }
-            eval = eval == std::numeric_limits<int>::max() ? -maxEval : maxEval;
         } else {
-            eval = Game::AI::GetEval(depth) + aiDiskMul*2;
-            text = string_format("Eval: %d (depth: %d)", Game::AI::GetEval(depth) + aiDiskMul*2, depth);
+            text = string_format("Eval: %d (depth: %d)", eval, depth);
         }
-        evalBarValueGoal = (float)eval/(float)maxEval;
+        evalBarValueGoal = (double)eval/(double)100;
 
         if (!gameStarted) {
             evalBarValueGoal = 0.f;
@@ -119,7 +111,7 @@ void animateLoop() {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
-        float diff = evalBarValueGoal - evalBarValue;
+        double diff = evalBarValueGoal - evalBarValue;
         if (diff < 0) diff *= -1;
         if (diff < evalBarAnimationRate) {
             evalBarValue = evalBarValueGoal;

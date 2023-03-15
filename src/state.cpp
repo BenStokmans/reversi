@@ -23,9 +23,9 @@ std::string currentEvalText = "Eval: uninitialized";
 std::unordered_map<uint64_t, Move> bestMoveNow = std::unordered_map<uint64_t, Move>();
 std::unordered_map<uint64_t, Move> bestMoveNext = std::unordered_map<uint64_t, Move>();
 bool enableEvalBar = true;
-float evalBarValueGoal = 0.f;
-float evalBarAnimationRate = 0.01f;
-float evalBarValue = 0.f;
+double evalBarValueGoal = 0.f;
+double evalBarAnimationRate = 0.01f;
+double evalBarValue = 0.f;
 
 bool showGameWindow = true;
 bool showWinWindow = true;
