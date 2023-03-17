@@ -5,7 +5,7 @@ void drawDisks(Shader* shader) {
 
     double mouseX, mouseY;
     glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
-    auto hoverCell = screenToCellCoords(mouseX, mouseY);
+    auto hoverCell = screenToCellCoordinates(mouseX, mouseY);
 
     // draw all disks on the board and the hovered cell if it's our turn
     for (int i = 0; i < boardSize; i++) {

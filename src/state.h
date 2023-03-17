@@ -27,13 +27,10 @@ struct Point {
 
 
 struct Move {
-    Point cell;
+    Point cell{};
     int gain{};
     unsigned long boardHash{};
 
-    [[nodiscard]] bool isValid() const {
-        return gain != 0;
-    }
     bool operator < (const Move& move) const {
         return this->gain < move.gain;
     }

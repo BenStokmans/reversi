@@ -15,8 +15,8 @@ bool stdOutAvailable() {
 void Logger::create(const std::string& verbosity) {
     int length = wai_getExecutablePath(nullptr, 0, nullptr);
     char* rawPath = (char*)malloc(length + 1);
-    int dirnameLen;
-    wai_getExecutablePath(rawPath, length, &dirnameLen);
+    int dirNameLen;
+    wai_getExecutablePath(rawPath, length, &dirNameLen);
     rawPath[length] = '\0';
 
     auto path = std::filesystem::path(rawPath);
