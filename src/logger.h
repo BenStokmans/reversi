@@ -17,10 +17,6 @@ public:
     void create(const std::string& verbosity);
     void write(std::string_view verbosity, std::string_view source, std::string_view message);
 
-    void disableStdOut() {
-        this->stdOut = false;
-    }
-
     void trace(std::string_view source, std::string_view message);
     void debug(std::string_view source, std::string_view message);
     void error(std::string_view source, std::string_view message);

@@ -125,7 +125,7 @@ GLuint createCellVertexArray(Shader* shader) {
     return cellVertexArray;
 }
 
-Point screenToCellCoords(double x, double y) {
+Point screenToCellCoordinates(double x, double y) {
     // 0, 0 is top left of window
     // 800, 800 is bottom right of window
     // our grid has the y-axis inverted compared to the mouse coordinates, so we'll account for that

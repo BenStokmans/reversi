@@ -19,7 +19,7 @@
 
 class Shader {
 public:
-    Shader() {}
+    Shader() = default;
     Shader(const char* vertexSource, const char* fragmentSource);
     ~Shader();
 
@@ -38,7 +38,7 @@ public:
 
     GLint getAttributeLocation(const char* name) const;
 private:
-    GLuint program;
+    GLuint program{};
     std::unordered_map<std::string, GLint> cachedUniforms;
 };
 

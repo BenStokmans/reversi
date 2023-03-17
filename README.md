@@ -1,6 +1,4 @@
 # Reversi
-## Roadmap
-* Implement an online gamemode to play against friends
 ## Building from source
 ### Prerequisites
 * CMake (>= 3.12)

@@ -12,6 +12,6 @@ GLuint createGridVertexArray(Shader* shader);
 GLuint createDiskVertexArray(Shader* shader);
 GLuint createCellVertexArray(Shader* shader);
 
-Point screenToCellCoords(double x, double y);
+Point screenToCellCoordinates(double x, double y);
 
 #endif //REVERSI_UI_HELPER_H
