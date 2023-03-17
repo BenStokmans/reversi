@@ -149,7 +149,10 @@ int_fast8_t dynHeuristicEval(FastBoard board)  {
 
 int_fast8_t FastBoard::Eval(bool maxPlayer) const {
     int_fast8_t eval = dynHeuristicEval(*this);
-    return maxPlayer ? eval : -1 * eval;
+
+    // flip eval
+    if (!maxPlayer) eval *= -1;
+    return eval;
 }
 
 bool FastBoard::GetIsCurrentPlayer(uint_fast8_t x, uint_fast8_t y) const {
@@ -160,7 +163,7 @@ bool FastBoard::GetIsOpponentPlayer(uint_fast8_t x, uint_fast8_t y) const {
     return (this->opponent & 1ULL << (y*8+x)) != 0;
 }
 
-bool FastBoard::CellIsOpen(uint_fast8_t x, uint_fast8_t y) {
+bool FastBoard::CellIsOpen(uint_fast8_t x, uint_fast8_t y) const {
     return (~(this->player | this->opponent) & 1ULL << (y*8+x)) != 0;
 }
 

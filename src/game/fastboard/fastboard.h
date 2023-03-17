@@ -32,7 +32,7 @@ public:
     [[nodiscard]] bool GameOver() const {
         return legalMoves(player, opponent) == 0 && legalMoves(opponent, player) == 0;
     }
-    bool CellIsOpen(uint_fast8_t x, uint_fast8_t y);
+    bool CellIsOpen(uint_fast8_t x, uint_fast8_t y) const;
     FastBoard Clone() {
         return FastBoard{player, opponent};
     }

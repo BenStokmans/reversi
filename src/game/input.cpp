@@ -26,7 +26,7 @@ void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, 
     // get cursor position as cell coordinate
     double x, y;
     glfwGetCursorPos(window, &x, &y);
-    auto cell = screenToCellCoords(x, y);
+    auto cell = screenToCellCoordinates(x, y);
 
     // check if the move is valid
     int pos = cell.y * 8 + cell.x;

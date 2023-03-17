@@ -85,7 +85,7 @@ void Client::Connect() {
     if (connected) {
         return;
     }
-    struct sockaddr_in serv_addr{};
+    struct sockaddr_in address{};
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         logger.error("NETWORK","socket creation error");
         onlineErrorStr = "Error: socket creation failed";
@@ -93,17 +93,17 @@ void Client::Connect() {
         return;
     }
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    address.sin_family = AF_INET;
+    address.sin_port = htons(PORT);
 
-    if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, ip.c_str(), &address.sin_addr) <= 0) {
         logger.error("NETWORK", "invalid address/address not supported");
         onlineErrorStr = "Error: invalid address";
         onlineError = true;
         return;
     }
 
-    if (connect(sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr)) != 0) {
+    if (connect(sock, (struct sockaddr*)&address, sizeof(address)) != 0) {
         logger.error("NETWORK", "connection failed");
         onlineErrorStr = "Error: connection failed";
         onlineError = true;

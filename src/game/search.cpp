@@ -77,7 +77,7 @@ void searchLoop() {
         }
 
         if (eval == 100 || eval == -100) {
-            int_fast8_t d = depth - Game::AI::GetEndGame(depth);
+            int_fast8_t d = depth - Game::AI::GetEndGame(depth); // NOLINT(cppcoreguidelines-narrowing-conversions)
             const char* color = eval == 100 ? "black" : "white" ;
             if (d == 0) {
                 text = string_format("Eval: %s has won", color, d, depth);
