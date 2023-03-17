@@ -1,6 +1,18 @@
 #include "state.h"
 #include "game/fastboard/fastboard.h"
 
+bool connected;
+std::string ip;
+std::string gameId;
+std::string username = "Player";
+const char* onlineColorStr = "Random";
+reversi::Color onlineColor;
+reversi::Color assignedColor;
+int64_t onlineGameId;
+std::string onlineErrorStr;
+bool onlineError = false;
+FastBoard prevBoard;
+
 bool showAiMove = false;
 Move cachedAiMove = {};
 

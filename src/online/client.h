@@ -8,17 +8,19 @@
 #include <unistd.h>
 
 #include <thread>
-#include "../logger.h"
-#include "src/online/reversi.pb.h"
-#include <google/protobuf/any.pb.h>
+#include "handler.h"
+#include "src/game/reversi.h"
 
 #define PORT 8080
 
-void sendMsg(const google::protobuf::Message& message);
-
 namespace Client {
+    void CreateGame();
+    void JoinGame();
+    void Send(const google::protobuf::Message& message);
+    void PlayMove(const Point& point);
     void Connect();
     void Disconnect();
+    void LeaveGame();
 }
 
 #endif //REVERSI_CLIENT_H

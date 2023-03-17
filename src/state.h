@@ -4,6 +4,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "game/fastboard/fastboard.h"
+#include "src/online/reversi.pb.h"
 #include <vector>
 #include <unordered_map>
 
@@ -50,6 +51,19 @@ enum AiDifficulty : int {
     Average,
     Hard,
 };
+
+// online settings
+extern bool connected;
+extern std::string ip;
+extern std::string gameId;
+extern std::string username;
+extern const char* onlineColorStr;
+extern reversi::Color onlineColor;
+extern reversi::Color assignedColor;
+extern int64_t onlineGameId;
+extern std::string onlineErrorStr;
+extern bool onlineError;
+extern FastBoard prevBoard;
 
 // ai settings
 extern bool showAiMove;

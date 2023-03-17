@@ -11,7 +11,7 @@ void LocalTab::Draw() {
             Game::AI::PlayBestMove();
     }
     ImGui::Separator();
-    const char* gameModeItems[] = { "Local", "vs AI", /*"Online"*/ };
+    const char* gameModeItems[] = { "Local", "vs AI", "Online" };
     if (ImGui::BeginCombo("Game mode", gameModeStr)) {
         for (int n = 0; n < IM_ARRAYSIZE(gameModeItems); n++) {
             bool selected = (gameModeStr == gameModeItems[n]);
@@ -26,7 +26,13 @@ void LocalTab::Draw() {
         }
         ImGui::EndCombo();
     }
+    if (gameMode == GameMode::Online) {
+        quiescenceSearchEnabled = false;
+        showEval = false;
+        enableEvalBar = false;
+    }
     ImGui::Separator();
+    ImGui::BeginDisabled(gameMode == GameMode::Online);
     ImGui::Checkbox("Show Eval", &showEval);
     if (showEval) {
         ImGui::Text("%s", currentEvalText.c_str());
@@ -36,5 +42,6 @@ void LocalTab::Draw() {
             Game::AI::StartEvalBarAnimation();
         }
     }
+    ImGui::EndDisabled();
     ImGui::EndTabItem();
 }

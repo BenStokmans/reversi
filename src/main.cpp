@@ -5,13 +5,11 @@ int main() {
 
     // initialize Logger
     logger.create("TRACE");
-    logger.info("starting reversi UI");
+    logger.info("starting reversi UI - v1.0");
 
     UI::Init();
     AIEnv::Init();
     Game::Init();
-    Client::Connect();
-
 
     // shader loading has to be done in main
     LOG_SHADER_NAME(evalVert, evalFrag);
@@ -68,7 +66,8 @@ int main() {
 
     logger.trace("OPENGL", "cleaning up buffers and vertex arrays");
 
-    // clean up rendering context
+    // clean up rendering context and client
+    Client::Disconnect();
     UI::Destroy();
     return 0;
 }

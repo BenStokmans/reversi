@@ -11,9 +11,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_glfw.h"
 
-#include "../logger.h"
 #include "../game/input.h"
-#include "../state.h"
 #include "../game/ai.h"
 
 #include "game.h"
@@ -21,6 +19,7 @@
 #include "tabs/theme.h"
 #include "tabs/debug.h"
 #include "tabs/ai.h"
+#include "tabs/online.h"
 
 namespace UI {
     void DrawGame(

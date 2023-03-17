@@ -1,4 +1,5 @@
 #include "input.h"
+#include "src/online/client.h"
 
 void bufferSizeCallback([[maybe_unused]] GLFWwindow* window, int w, int h) {
     glViewport(0, 0, w, h);
@@ -27,28 +28,36 @@ void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, 
     glfwGetCursorPos(window, &x, &y);
     auto cell = screenToCellCoords(x, y);
 
-    // if the move has valid directions
+    // check if the move is valid
     int pos = cell.y * 8 + cell.x;
     if ((gameBoard.Moves() & 1ULL << pos) == 0) return;
 
-    clientTurn = false;
     if (!gameStarted) gameStarted = true;
+    clientTurn = false;
+
     // play the move
     modifiedCells = 0;
+    prevBoard = gameBoard.Clone();
     modifiedCells = gameBoard.Play(pos);
     bestMoveNow = bestMoveNext;
 
-    if (gameMode == GameMode::AI && !aiManual) {
-        std::thread thr(Game::AI::PlayBestMove);
-        thr.detach();
+    if (gameMode == GameMode::Online) {
+        Client::PlayMove(cell);
+        return;
     }
 
-    if (gameMode == GameMode::Local) {
-        clientTurn = true;
-        if (gameBoard.Moves() == 0) {
-            gameBoard.SwitchTurn();
-            return;
-        }
-        clientIsWhite = !clientIsWhite;
+    if (gameMode == GameMode::AI) {
+        if (aiManual) return;
+
+        std::thread thr(Game::AI::PlayBestMove);
+        thr.detach();
+        return;
     }
+
+    clientTurn = true;
+    if (gameBoard.Moves() == 0) {
+        gameBoard.SwitchTurn();
+        return;
+    }
+    clientIsWhite = !clientIsWhite;
 }

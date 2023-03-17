@@ -11,3 +11,6 @@
 [submodule "lib/uint128_t"]
 	path = lib/uint128_t
 	url = https://github.com/calccrypto/uint128_t.git
+[submodule "lib/whereami"]
+	path = lib/whereami
+	url = https://github.com/gpakosz/whereami

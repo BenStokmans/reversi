@@ -3,7 +3,10 @@
 
 #include "shader.h"
 #include "../state.h"
+#include "imgui.h"
 
+void centeredText(const char* text);
+bool centeredButton(const char* label);
 GLuint createEvalVertexArray(Shader* shader);
 GLuint createGridVertexArray(Shader* shader);
 GLuint createDiskVertexArray(Shader* shader);

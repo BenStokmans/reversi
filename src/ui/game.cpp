@@ -34,6 +34,7 @@ void drawDisks(Shader* shader) {
 }
 
 void highlightPossibleMoves(Shader* shader) {
+    if (gameMode == GameMode::Online && !gameStarted) return;
     if (!highlightPossibleCells || !clientTurn) return;
     float cellSize = 1.0f / (float)boardSize;
     shader->set("color", highlightPossibleColor);

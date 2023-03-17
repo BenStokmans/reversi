@@ -14,14 +14,15 @@ void UI::DrawUI() {
         glfwSetWindowShouldClose(glfwWindow, true);
     }
     ImGui::BeginTabBar("Reversi#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
-    if (gameBoard.GameOver()) {
-        drawGameOver();
-    }
+
+    if (gameBoard.GameOver()) drawGameOver();
+    if (onlineError) drawOnlineError();
 
     LocalTab::Draw();
     if (gameMode == GameMode::AI || gameMode == GameMode::Local)
         AITab::Draw();
-
+    if (gameMode == GameMode::Online)
+        OnlineTab::Draw();
     ThemeTab::Draw();
 #ifdef DEBUG
     DebugTab::Draw();
@@ -67,6 +68,8 @@ void UI::DrawGame(
     diskShader->use();
     glBindVertexArray(diskVAO);
     drawDisks(diskShader);
+
+    if (!enableEvalBar) return;
 
     evalShader->use();
     evalShader->set("divider", (float)evalBarValue);
@@ -140,6 +143,16 @@ void initGLAD() {
     glDisable(GL_CULL_FACE);
 }
 
+static const char* ImGui_ImplGlfw_GetClipboardText(void* user_data)
+{
+    return glfwGetClipboardString((GLFWwindow*)user_data);
+}
+
+static void ImGui_ImplGlfw_SetClipboardText(void* user_data, const char* text)
+{
+    glfwSetClipboardString((GLFWwindow*)user_data, text);
+}
+
 void initImGui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -148,6 +161,8 @@ void initImGui() {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
+    io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
 
     ImGuiStyle& style = ImGui::GetStyle();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
