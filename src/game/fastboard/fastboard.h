@@ -4,7 +4,7 @@
 #include <string>
 #include <cstdint>
 #include "moves.h"
-#include "../../state.h"
+#include "../../logger.h"
 
 uint_fast8_t countSetBits(uint64_t n);
 
@@ -15,10 +15,14 @@ namespace AIEnv {
 struct FastBoard {
 public:
     uint64_t player{}, opponent{};
-    void Play(uint_fast8_t x, uint_fast8_t y);
-    void Play(uint_fast8_t place);
+    uint64_t Play(uint_fast8_t x, uint_fast8_t y);
+    uint64_t Play(uint_fast8_t place);
 
-    [[nodiscard]] int Eval(bool max) const;
+    void Reset() {
+        player = 0x0000001008000000ULL;
+        opponent = 0x0000000810000000ULL;
+    }
+    [[nodiscard]] int_fast8_t Eval(bool maxPlayer) const;
     [[nodiscard]] uint64_t Moves() const {
         return legalMoves(player, opponent);
     }
@@ -26,14 +30,21 @@ public:
         return ::hash(player, opponent);
     }
     [[nodiscard]] bool GameOver() const {
-        return Moves() == 0;
+        return legalMoves(player, opponent) == 0 && legalMoves(opponent, player) == 0;
     }
+    bool CellIsOpen(uint_fast8_t x, uint_fast8_t y);
     FastBoard Clone() {
         return FastBoard{player, opponent};
     }
+    [[nodiscard]] bool GetIsCurrentPlayer(uint_fast8_t x, uint_fast8_t y) const;
+    [[nodiscard]] bool GetIsOpponentPlayer(uint_fast8_t x, uint_fast8_t y) const;
     void SwitchTurn() {
         std::swap(player, opponent);
     }
+
+    [[nodiscard]] int PlayerDisks() const;
+
+    [[nodiscard]] int OpponentDisks() const;
 };
 
 

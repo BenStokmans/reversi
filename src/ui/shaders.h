@@ -5,6 +5,8 @@ extern const char* cellFrag;
 extern const char* cellVert;
 extern const char* diskFrag;
 extern const char* diskVert;
+extern const char* evalFrag;
+extern const char* evalVert;
 extern const char* gridFrag;
 extern const char* gridVert;
 

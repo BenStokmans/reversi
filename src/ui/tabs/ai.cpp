@@ -20,7 +20,7 @@ void AITab::Draw() {
         ImGui::EndCombo();
     }
     ImGui::BeginDisabled(aiDifficulty != AiDifficulty::Hard);
-    ImGui::SliderInt("Depth", &aiDepth, 1, 15, "%d", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::SliderInt("Depth", &aiDepth, 1, 30, "%d", ImGuiSliderFlags_AlwaysClamp);
     ImGui::EndDisabled();
 
     ImGui::Separator();
@@ -32,7 +32,7 @@ void AITab::Draw() {
     }
 
     if (aiManual) {
-        ImGui::BeginDisabled(CURRENT_PLAYER != aiColor || !gameStarted);
+        ImGui::BeginDisabled(clientTurn || !gameStarted);
         if (ImGui::Button("Play next AI move"))
             Game::AI::PlayBestMove();
         ImGui::EndDisabled();
@@ -51,7 +51,8 @@ void AITab::Draw() {
                 }
                 clientIsWhite = aiColor == 1;
                 if (clientIsWhite && !gameStarted) {
-                    Game::AI::PlayBestMove();
+                    std::thread thr(Game::AI::PlayBestMove);
+                    thr.detach();
                 }
                 currentLegalMoves.clear();
             }

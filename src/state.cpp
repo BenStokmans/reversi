@@ -1,24 +1,47 @@
 #include "state.h"
+#include "game/fastboard/fastboard.h"
+
+bool connected;
+std::string ip;
+std::string gameId;
+std::string username = "Player";
+const char* onlineColorStr = "Random";
+reversi::Color onlineColor;
+reversi::Color assignedColor;
+int64_t onlineGameId;
+std::string onlineErrorStr;
+bool onlineError = false;
+FastBoard prevBoard;
 
 bool showAiMove = false;
 Move cachedAiMove = {};
 
-int aiDiskMul = 4; // weight = 1
-int aiEdgeDiskMul = 6; // weight = 1.5
+int aiDiskMul = 4; // weight = 1.0
+int aiEdgeDiskMul = 5; // weight = 1.25
 int aiAdjacentCornerDiskMul = 3; // weight = 0.75
-int aiCornerDiskMul = 10; // weight = 2.5
+int aiCornerDiskMul = 6; // weight = 1.5
 
 bool aiManual = false;
 const char* aiDifficultyStr = "Random";
 AiDifficulty aiDifficulty = AiDifficulty::Random;
 const char* aiColorStr = "White";
 char aiColor = 2; // white
-int aiDepth = 1;
+int aiDepth = 10;
+
+bool showEval = true;
+int quiescenceSearchLim = 25;
+bool quiescenceSearchEnabled = true;
+std::string currentEvalText = "Eval: uninitialized";
+std::unordered_map<uint64_t, Move> bestMoveNow = std::unordered_map<uint64_t, Move>();
+std::unordered_map<uint64_t, Move> bestMoveNext = std::unordered_map<uint64_t, Move>();
+bool enableEvalBar = true;
+double evalBarValueGoal = 0.f;
+double evalBarAnimationRate = 0.01f;
+double evalBarValue = 0.f;
 
 bool showGameWindow = true;
 bool showWinWindow = true;
 bool winWindowFocus = true;
-bool gameOver = true;
 
 int windowStartX = 100, windowStartY = 100;
 
@@ -40,9 +63,9 @@ bool highlightModifiedCells = true;
 Color4 highlightAiColor = {50, 80, 150, 255};
 bool highlightAiMove = false;
 
-std::vector<Point> modifiedCells;
+uint64_t modifiedCells;
 std::vector<Move> currentLegalMoves;
 bool highlighted[8][8] = {};
-char gameBoard[8][8] = {};
+FastBoard gameBoard;
 
 GLFWwindow* glfwWindow = nullptr;

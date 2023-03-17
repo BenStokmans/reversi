@@ -1,5 +1,5 @@
 #include "input.h"
-#include "ai.h"
+#include "src/online/client.h"
 
 void bufferSizeCallback([[maybe_unused]] GLFWwindow* window, int w, int h) {
     glViewport(0, 0, w, h);
@@ -7,6 +7,7 @@ void bufferSizeCallback([[maybe_unused]] GLFWwindow* window, int w, int h) {
 
 void keyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, [[maybe_unused]] int action, int mods) {
     if (key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q || (key == GLFW_KEY_F4 && GLFW_MOD_ALT & mods)) {
+        quiescenceSearchEnabled = false;
         glfwSetWindowShouldClose(window, true);
     }
 }
@@ -27,18 +28,36 @@ void mouseCallback(GLFWwindow* window, [[maybe_unused]] int button, int action, 
     glfwGetCursorPos(window, &x, &y);
     auto cell = screenToCellCoords(x, y);
 
-    // if the move has valid directions
-    Move move = Game::GetMove(cell);
-    if (!move.isValid()) return;
+    // check if the move is valid
+    int pos = cell.y * 8 + cell.x;
+    if ((gameBoard.Moves() & 1ULL << pos) == 0) return;
+
+    if (!gameStarted) gameStarted = true;
+    clientTurn = false;
 
     // play the move
-    Game::PlayMove(move, LOCAL_PLAYER);
+    modifiedCells = 0;
+    prevBoard = gameBoard.Clone();
+    modifiedCells = gameBoard.Play(pos);
+    bestMoveNow = bestMoveNext;
 
-    if (gameMode == GameMode::AI && !aiManual)
-        Game::AI::PlayBestMove();
-
-    if (gameMode == GameMode::Local) {
-        clientTurn = true;
-        clientIsWhite = !clientIsWhite;
+    if (gameMode == GameMode::Online) {
+        Client::PlayMove(cell);
+        return;
     }
+
+    if (gameMode == GameMode::AI) {
+        if (aiManual) return;
+
+        std::thread thr(Game::AI::PlayBestMove);
+        thr.detach();
+        return;
+    }
+
+    clientTurn = true;
+    if (gameBoard.Moves() == 0) {
+        gameBoard.SwitchTurn();
+        return;
+    }
+    clientIsWhite = !clientIsWhite;
 }

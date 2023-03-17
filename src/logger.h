@@ -10,11 +10,16 @@
 #include <iostream>
 #include <chrono>
 #include "glad/glad.h"
+#include "lib/whereami/src/whereami.h"
 
 class Logger {
 public:
     void create(const std::string& verbosity);
     void write(std::string_view verbosity, std::string_view source, std::string_view message);
+
+    void disableStdOut() {
+        this->stdOut = false;
+    }
 
     void trace(std::string_view source, std::string_view message);
     void debug(std::string_view source, std::string_view message);
@@ -30,6 +35,7 @@ public:
     void logShaderInfo(std::string_view source, GLuint shader);
 private:
     std::vector<std::string> levels;
+    bool stdOut = true;
 
     std::filesystem::path filePath;
     int currentVerbosityIndex;

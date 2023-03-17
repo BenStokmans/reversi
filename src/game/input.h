@@ -9,6 +9,8 @@
 #include "imgui.h"
 #include "../ui/helper.h"
 #include "reversi.h"
+#include "ai.h"
+#include <thread>
 
 void bufferSizeCallback([[maybe_unused]] GLFWwindow* win, int w, int h);
 void keyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, [[maybe_unused]] int action, int mods);

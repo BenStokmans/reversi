@@ -1,15 +1,21 @@
 #include "main.h"
 
 int main() {
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
+
     // initialize Logger
     logger.create("TRACE");
-    logger.info("starting reversi UI");
+    logger.info("starting reversi UI - v1.0");
 
     UI::Init();
     AIEnv::Init();
     Game::Init();
 
     // shader loading has to be done in main
+    LOG_SHADER_NAME(evalVert, evalFrag);
+    Shader evalShader = Shader(evalVert, evalFrag);
+    GLuint evalVertexArray = createEvalVertexArray(&evalShader);
+
     LOG_SHADER_NAME(gridVert, gridFrag);
     Shader gridShader = Shader(gridVert, gridFrag);
     GLuint gridVertexArray = createGridVertexArray(&gridShader);
@@ -40,6 +46,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         UI::DrawGame(
+                &evalShader, evalVertexArray,
                 &gridShader, gridVertexArray,
                 &cellShader, cellVertexArray,
                 &diskShader, diskVertexArray
@@ -59,7 +66,8 @@ int main() {
 
     logger.trace("OPENGL", "cleaning up buffers and vertex arrays");
 
-    // clean up rendering context
+    // clean up rendering context and client
+    Client::Disconnect();
     UI::Destroy();
     return 0;
 }

@@ -3,7 +3,10 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "game/fastboard/fastboard.h"
+#include "src/online/reversi.pb.h"
 #include <vector>
+#include <unordered_map>
 
 #define DEBUG
 
@@ -25,7 +28,6 @@ struct Point {
 
 struct Move {
     Point cell;
-    std::vector<Point> directions;
     int gain{};
     unsigned long boardHash{};
 
@@ -50,6 +52,19 @@ enum AiDifficulty : int {
     Hard,
 };
 
+// online settings
+extern bool connected;
+extern std::string ip;
+extern std::string gameId;
+extern std::string username;
+extern const char* onlineColorStr;
+extern reversi::Color onlineColor;
+extern reversi::Color assignedColor;
+extern int64_t onlineGameId;
+extern std::string onlineErrorStr;
+extern bool onlineError;
+extern FastBoard prevBoard;
+
 // ai settings
 extern bool showAiMove;
 extern Move cachedAiMove;
@@ -65,12 +80,24 @@ extern const char* aiColorStr;
 extern char aiColor;
 extern int aiDepth;
 
+// eval settings
+extern bool showEval;
+extern int quiescenceSearchLim;
+extern bool quiescenceSearchEnabled;
+extern std::string currentEvalText;
+extern std::unordered_map<uint64_t, Move> bestMoveNow;
+extern std::unordered_map<uint64_t, Move> bestMoveNext;
+// eval bar animation
+extern bool enableEvalBar;
+extern double evalBarAnimationRate;
+extern double evalBarValueGoal;
+extern double evalBarValue;
+
 // window settings
 extern bool showDebugWindow;
 extern bool showGameWindow;
 extern bool showWinWindow;
 extern bool winWindowFocus;
-extern bool gameOver;
 
 extern int windowStartX, windowStartY;
 
@@ -98,10 +125,11 @@ extern bool highlightModifiedCells;
 extern Color4 highlightAiColor;
 extern bool highlightAiMove;
 
-extern std::vector<Point> modifiedCells;
+extern uint64_t modifiedCells;
 extern std::vector<Move> currentLegalMoves;
 extern bool highlighted[8][8];
-extern char gameBoard[8][8];
+extern FastBoard gameBoard;
+
 
 extern GLFWwindow* glfwWindow;
 

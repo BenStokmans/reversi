@@ -1,0 +1,65 @@
+syntax = "proto3";
+package reversi;
+
+option go_package = "../reversi-server/handler";
+
+enum Color {
+  RANDOM = 0;
+  BLACK = 1;
+  WHITE = 2;
+}
+
+message Heartbeat { }
+
+message Connected {
+  int64 player_id = 1;
+}
+
+message CreateGame {
+  string player_name = 1;
+  optional Color color = 2;
+}
+
+message CreateGameResponse {
+  int64 game_id = 1;
+  Color color = 2;
+  optional string error = 3;
+}
+
+message GameStart { }
+
+message JoinGame {
+  string player_name = 1;
+  int64 game_id = 2;
+}
+
+message JoinGameResponse {
+  Color color = 1;
+  optional string error = 2;
+}
+
+message LeaveGame {
+  int64 game_id = 1;
+}
+
+message PlayMove {
+  uint32 x = 1;
+  uint32 y = 2;
+}
+
+message GameMove {
+  int64 game_id = 1;
+  uint32 x = 2;
+  uint32 y = 3;
+  bool pass = 4;
+}
+
+message PlayMoveResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+message GameEnded {
+  Color winner = 1;
+  optional string special_reason = 2;
+}
